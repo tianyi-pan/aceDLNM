@@ -1,0 +1,22 @@
+.Rhistory
+.DS_Store
+.Rapp.history
+*.rdb
+
+.RData
+
+
+## c files
+.o
+.so
+*/.o
+*/.so
+*/*/.o
+*/*/.so
+src/*.so
+src/*.o
+
+src/.DS_Store
+
+.Rproj.user/
+.vscode/
