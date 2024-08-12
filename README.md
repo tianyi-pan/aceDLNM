@@ -1,5 +1,13 @@
 # aceDLNM
+R package for Adaptive Cumulative Exposure Distributed Lag Non-Linear Models (ACE-DLNM)
+
+## Installation
++ Install the development version from GitHub:
 
 ```R
-devtools::install_github("tianyi-pan/aceDLNM" ,auth_token = "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",  INSTALL_opts = '--no-lock')
+# install.packages('devtools')
+devtools::install_github("tianyi-pan/aceDLNM")
 ```
+
+## Documentation
++ A brief [vignette](https://tianyi-pan.github.io/aceDLNM)

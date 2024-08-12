@@ -54,7 +54,7 @@
 #'   optimizations.
 #'
 #' @return Object of class \code{aceDLNM_fit}. S3 function \code{summary},
-#'   \code{residuals}, and \code{plot}.
+#'   \code{residuals}, and \code{predict}.
 #' @importFrom mgcv s
 #' @importFrom data.table as.data.table
 #' @importFrom data.table setorder
