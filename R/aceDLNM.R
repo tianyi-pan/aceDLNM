@@ -5,7 +5,8 @@
 #'   exposure history. Use sX() for the distributed lag term. For example y ~
 #'   sX(t, x).
 #' @param smooth the formula for the other smooth functions. The smooths are
-#'   specified by mgcv::s. For example ~ s(z)
+#'   specified by mgcv::s. For example ~ s(z). Note also that the Gaussian
+#'   random effect models are accommodated, by setting s(bs = "re").
 #' @param unpen.smooth the formula for the other unpenalized smooth functions.
 #' @param fe.varying the formula for time-varying covariates in linear
 #'   components. For example ~ z
@@ -82,6 +83,14 @@ aceDLNM <- function(formula,
 
   if(length(formula) != 3) stop("Incorrect formula. Please set a formula for example y~sX(t,x).")
   sXobject <- eval(formula[[3]])
+
+  ## change character columns to factor. support random effects defined by mgcv::s(bs = "re")
+  chr_col <- which(sapply(dat, class) == "character")
+  if(length(chr_col) >= 1) {
+    for(col. in chr_col) dat[,col.] <- factor(dat[,col.])
+  }
+
+
 
   sXdat <- dat
   ## change colnames in dataframe as x, t and y

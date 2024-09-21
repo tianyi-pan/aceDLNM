@@ -199,12 +199,15 @@ summary.aceDLNM_fit <- function(object, E.eval, others.eval = NULL,
   if(!is.null(object$smooth$others)) {
     # others.eval
     SS <- object$smooth$others
+
     smooth.name <- unlist(lapply(SS, "[[", "term")) # var name of smooth terms
     if(is.null(others.eval)) {
-      others.eval <- apply(object$modeldata[,smooth.name, drop=FALSE],
-                           2, function(col){
-        seq(min(col), max(col), length.out = 500)
-      })
+      others.eval <- data.frame(lapply(object$modeldata[,smooth.name, drop=FALSE],
+                                       function(col){
+                                         # support random effects
+                                         if(class(col) == "factor") return(factor(rep(col[1], 500), levels = levels(col)))
+                                         else return(seq(min(col), max(col), length.out = 500))
+                                       }))
     }
     Xpred <- lapply(SS, function(a){
       preddat <- data.frame(others.eval[,a$term])
@@ -260,7 +263,7 @@ summary.aceDLNM_fit <- function(object, E.eval, others.eval = NULL,
 
     fitted <- do.call("rbind", fitted)
 
-    smooth.mode <- data.frame(x = as.matrix(as.vector(others.eval), ncol = 1),
+    smooth.mode <- data.frame(x = as.matrix(as.vector(sapply(others.eval, as.numeric)), ncol = 1),
                            var = rep(colnames(others.eval), each = nrow(others.eval)),
                            mode = fitted)
 
@@ -290,7 +293,7 @@ summary.aceDLNM_fit <- function(object, E.eval, others.eval = NULL,
       }
       fitted_sample <- do.call("rbind", fitted_sample)
 
-      return(data.frame(x = as.matrix(as.vector(others.eval), ncol = 1),
+      return(data.frame(x = as.matrix(as.vector(sapply(others.eval, as.numeric)), ncol = 1),
                         var = rep(smooth.name, each = nrow(others.eval)),
                         est = fitted_sample,
                         iter = rep(i, length(fitted_sample))))
@@ -319,6 +322,10 @@ summary.aceDLNM_fit <- function(object, E.eval, others.eval = NULL,
         # }
       }
     }
+
+    # remove re terms
+    re_id <- which(unlist(lapply(lapply(SS, attr, "class"), "[[", 1)) == "random.effect")
+    if(length(re_id) >= 1) smooth.df <- dplyr::filter(smooth.df, !var %in% re_id)
 
     out$est$smooth = smooth.df
 
