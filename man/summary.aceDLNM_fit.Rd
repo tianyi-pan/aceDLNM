@@ -21,8 +21,8 @@
 \item{object}{object of class \code{aceDLNM_fit}.}
 
 \item{E.eval}{a vector of ACE where the ACE response-exposure-function is
-evaluated. The default is the range of estimated E, if the argument is
-missing.}
+evaluated. The default is a sequence from 0.0025 quantile to 0.9975
+quantile of estimated E, if the argument is missing.}
 
 \item{others.eval}{a data frame containing variables where the other smooth
 functions are evaluated.}
