@@ -521,9 +521,9 @@ public:
       eta.resize(n);
       eta_remaining.resize(n);
       mu.resize(n);
-
+      Vec Bf;
       for (int i = 0; i < n; i++) {
-        Vec Bf = BsplinevecCon(E(i), knots_f, 4, Zf);
+        Bf = BsplinevecCon(E(i), knots_f, 4, Zf);
         Bf_matrix.row(i) = Bf;
         eta(i) = Bf.dot(alpha_f);
         eta_remaining(i) = Xfix.row(i).dot(betaF) + Xrand.row(i).dot(betaR);
@@ -572,9 +572,9 @@ public:
     alpha_w_C_pen = phi / alpha_w_C_denominator;
 
     E = B_inner * alpha_w_C;
-
+    Vec Bf;
     for (int i = 0; i < n; i++) {
-      Vec Bf = BsplinevecCon(E(i), knots_f, 4, Zf);
+      Bf = BsplinevecCon(E(i), knots_f, 4, Zf);
       Bf_matrix.row(i) = Bf;
       eta(i) = Bf.dot(alpha_f);
       mu(i) = exp(eta(i) + eta_remaining(i));
@@ -922,8 +922,9 @@ public:
   // d log(mu) / d alpha_w
   Mat dlogmu_dw () {
     Mat out(n, kw);
+    Vec Bf1st;
     for (int i = 0; i < n; i++) {
-      Vec Bf1st = BsplinevecCon1st(E(i), knots_f, 4, Zf);
+      Bf1st = BsplinevecCon1st(E(i), knots_f, 4, Zf);
       out.row(i) = B_inner.row(i) * (Bf1st.dot(alpha_f));
     }
     return out;
@@ -987,8 +988,9 @@ public:
   // d^2 log(mu) / d alpha_w^2
   std::vector<Mat> d2logmu_dwdw () {
     std::vector<Mat> out;
+    Vec Bf2nd;
     for (int i = 0; i < n; i++) {
-      Vec Bf2nd = BsplinevecCon2nd(E(i), knots_f, 4, Zf);
+      Bf2nd = BsplinevecCon2nd(E(i), knots_f, 4, Zf);
       out.push_back((Bf2nd.dot(alpha_f)) * B_inner.row(i).transpose() * B_inner.row(i));
     }
     return out;
@@ -1049,8 +1051,8 @@ public:
     Scalar tmp1 = pow(alpha_w_C_denominator, -3); // pow(tmp, -1.5)
     Scalar tmp2 = pow(alpha_w_C_denominator, -5); // pow(tmp, -2.5)
     Vec Dwphi = Dw * phi_long;
+    Mat outlarge(kw, kw);
     for (int s = 0; s < kw; s++) {
-      Mat outlarge(kw, kw);
       if (s == 0) {
         outlarge = -1.0 * tmp1 * Dw + 3.0 * tmp2 * Dwphi * Dwphi.transpose();
       } else {
@@ -1384,8 +1386,9 @@ public:
     Eigen::PartialPivLU<Mat> lu(he_s_u_mat);
     Mat LU = lu.matrixLU();
     // Scalar c = lu.permutationP().determinant(); // -1 or 1
+    Scalar lii;
     for (int i = 0; i < LU.rows(); i++) {
-      Scalar lii = LU(i,i);
+      lii = LU(i,i);
       // std::cout << "lii : " << (double) lii << std::endl;
       // std::cout << "c : " << (double) c << std::endl;
       // if (lii < 0.0) c *= -1;
@@ -2602,9 +2605,9 @@ public:
       eta.resize(n);
       eta_remaining.resize(n);
       mu.resize(n);
-
+      Vec Bf;
       for (int i = 0; i < n; i++) {
-        Vec Bf = BsplinevecCon(E(i), knots_f, 4, Zf);
+        Bf = BsplinevecCon(E(i), knots_f, 4, Zf);
         Bf_matrix.row(i) = Bf;
         eta(i) = Bf.dot(alpha_f);
         eta_remaining(i) = Xfix.row(i).dot(betaF);
@@ -2655,9 +2658,9 @@ public:
     alpha_w_C_pen = phi / alpha_w_C_denominator;
 
     E = B_inner * alpha_w_C;
-
+    Vec Bf;
     for (int i = 0; i < n; i++) {
-      Vec Bf = BsplinevecCon(E(i), knots_f, 4, Zf);
+      Bf = BsplinevecCon(E(i), knots_f, 4, Zf);
       Bf_matrix.row(i) = Bf;
       eta(i) = Bf.dot(alpha_f);
       mu(i) = exp(eta(i) + eta_remaining(i));
@@ -2943,8 +2946,9 @@ public:
   // d log(mu) / d alpha_w
   Mat dlogmu_dw () {
     Mat out(n, kw);
+    Vec Bf1st;
     for (int i = 0; i < n; i++) {
-      Vec Bf1st = BsplinevecCon1st(E(i), knots_f, 4, Zf);
+      Bf1st = BsplinevecCon1st(E(i), knots_f, 4, Zf);
       out.row(i) = B_inner.row(i) * (Bf1st.dot(alpha_f));
     }
     return out;
@@ -3053,8 +3057,8 @@ public:
     Scalar tmp1 = pow(alpha_w_C_denominator, -3); // pow(tmp, -1.5)
     Scalar tmp2 = pow(alpha_w_C_denominator, -5); // pow(tmp, -2.5)
     Vec Dwphi = Dw * phi_long;
+    Mat outlarge(kw, kw);
     for (int s = 0; s < kw; s++) {
-      Mat outlarge(kw, kw);
       if (s == 0) {
         outlarge = -1.0 * tmp1 * Dw + 3.0 * tmp2 * Dwphi * Dwphi.transpose();
       } else {
@@ -3276,8 +3280,9 @@ public:
     Eigen::PartialPivLU<Mat> lu(he_s_u_mat);
     Mat LU = lu.matrixLU();
     // Scalar c = lu.permutationP().determinant(); // -1 or 1
+    Scalar lii;
     for (int i = 0; i < LU.rows(); i++) {
-      Scalar lii = LU(i,i);
+      lii = LU(i,i);
       logdetH05 += log(abs(lii));
     }
     return logdetH05/2.0;
