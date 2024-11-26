@@ -893,9 +893,15 @@ aceDLNM <- function(formula,
       out$hessian <- H.LAML
 
       e.H <- eigen(H.LAML)
+
       out$eigen.hessian <- e.H
 
-      suggest.step <- e.H$vectors %*% diag(sapply(1/e.H$values, function(e.) max(e., 0.01))) %*% t(e.H$vectors) %*% results$env$gr
+      evals <- e.H$vectors
+
+      if(abs(prod(evals)) < 1e-3) evals <- evals + sqrt(sum((out$env$gr)^2))
+
+      suggest.step <- e.H$vectors %*% diag(1/abs(evals)) %*% t(e.H$vectors) %*% out$env$gr
+
       out$suggest.step <- suggest.step
       if(verbose) cat("finish obtain Hessian matrix. \n")
     }
