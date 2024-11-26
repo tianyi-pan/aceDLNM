@@ -896,7 +896,7 @@ aceDLNM <- function(formula,
 
       out$eigen.hessian <- e.H
 
-      evals <- e.H$vectors
+      evals <- e.H$values
 
       if(abs(prod(evals)) < 1e-3) evals <- evals + sqrt(sum((out$env$gr)^2))
 
