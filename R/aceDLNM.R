@@ -79,6 +79,7 @@ aceDLNM <- function(formula,
                     hessian = FALSE,
                     GD = TRUE,
                     GD.grtol = 1,
+                    check.BFGS = FALSE,
                     verbose = TRUE) {
 
   if(length(formula) != 3) stop("Incorrect formula. Please set a formula for example y~sX(t,x).")
@@ -870,5 +871,35 @@ aceDLNM <- function(formula,
   out$opttime <- opttime
   out$penalty <- "second"
   out$interpolate <- interpolate
+
+  ## check convergence of BFGS
+  if(check.BFGS) {
+    if(is.null(opt.LAML$hessian)){
+      if(verbose) cat("start obtain Hessian matrix. \n")
+      par.start[!par.fix.id] <- opt.LAML$par
+      H.LAML <- optimHess(par.start[!par.fix.id],
+                        fn = function(par.){
+                                            par.fn <- par.fix
+                                            par.fn[!par.fix.id] <- par.
+                                            return(LAML.fn(par.fn))
+                                            }, # objective function
+                        gr = function(par.){
+                                            par.fn <- par.fix
+                                            par.fn[!par.fix.id] <- par.
+                                            return(LAML.gr(par.fn)[!par.fix.id])
+                                            }, # gradient function
+                        control = list(trace = verbose)
+                        )
+      out$hessian <- H.LAML
+
+      e.H <- eigen(H.LAML)
+      out$eigen.hessian <- e.H
+
+      suggest.step <- e.H$vectors %*% diag(sapply(1/e.H$values, function(e.) max(e., 0.01))) %*% t(e.H$vectors) %*% results$env$gr
+      out$suggest.step <- suggest.step
+      if(verbose) cat("finish obtain Hessian matrix. \n")
+    }
+  }
+
   structure(out, class = "aceDLNM_fit") # S3 class
 }

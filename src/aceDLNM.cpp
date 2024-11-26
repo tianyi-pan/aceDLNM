@@ -1624,8 +1624,19 @@ void PL(Model& modelobj, bool verbose){
 
     Vec gr_PL = modelobj.gr_phi_vec;
     Mat he_PL(kw-1, kw-1);
-    Mat mat1 = modelobj.he_alpha_f_mat.ldlt().solve(modelobj.he_alpha_f_phi_mat);
-    he_PL = modelobj.he_phi_mat - mat1.transpose() * modelobj.he_alpha_f_phi_mat;
+    
+    // OLD: 
+    // Mat mat1 = modelobj.he_alpha_f_mat.ldlt().solve(modelobj.he_alpha_f_phi_mat);
+    // he_PL = modelobj.he_phi_mat - mat1.transpose() * modelobj.he_alpha_f_phi_mat;
+
+    // NEW: 
+    modelobj.derivative_f();
+    Mat mat_tmp_PL(kE+kbetaF+kbetaR,kw-1);
+    mat_tmp_PL.block(0, 0, kE, kw-1) = modelobj.he_alpha_f_phi_mat;
+    mat_tmp_PL.block(kE, 0, kbetaR, kw-1) = modelobj.he_phi_betaR_mat.transpose();
+    mat_tmp_PL.block(kE+kbetaR, 0, kbetaF, kw-1) = modelobj.he_phi_betaF_mat.transpose();
+    Mat mat1 = modelobj.he_inner_mat.ldlt().solve(mat_tmp_PL);
+    he_PL = modelobj.he_phi_mat - mat1.transpose() * mat_tmp_PL;
 
     modelobj.PL_gradient = gr_PL.cast<double>();
     modelobj.PL_hessian = he_PL.cast<double>();
@@ -3495,8 +3506,18 @@ void PL_nosmooth(Model_nosmooth& modelobj, bool verbose){
 
     Vec gr_PL = modelobj.gr_phi_vec;
     Mat he_PL(kw-1, kw-1);
-    Mat mat1 = modelobj.he_alpha_f_mat.ldlt().solve(modelobj.he_alpha_f_phi_mat);
-    he_PL = modelobj.he_phi_mat - mat1.transpose() * modelobj.he_alpha_f_phi_mat;
+
+    // OLD: 
+    // Mat mat1 = modelobj.he_alpha_f_mat.ldlt().solve(modelobj.he_alpha_f_phi_mat);
+    // he_PL = modelobj.he_phi_mat - mat1.transpose() * modelobj.he_alpha_f_phi_mat;
+
+    // NEW:
+    modelobj.derivative_f();
+    Mat mat_tmp_PL(kE+kbetaF,kw-1);
+    mat_tmp_PL.block(0, 0, kE, kw-1) = modelobj.he_alpha_f_phi_mat;
+    mat_tmp_PL.block(kE, 0, kbetaF, kw-1) = modelobj.he_phi_betaF_mat.transpose();
+    Mat mat1 = modelobj.he_inner_mat.ldlt().solve(mat_tmp_PL);
+    he_PL = modelobj.he_phi_mat - mat1.transpose() * mat_tmp_PL;
 
     modelobj.PL_gradient = gr_PL.cast<double>();
     modelobj.PL_hessian = he_PL.cast<double>();

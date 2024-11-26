@@ -30,6 +30,7 @@ aceDLNM(
   hessian = FALSE,
   GD = TRUE,
   GD.grtol = 1,
+  check.BFGS = FALSE,
   verbose = TRUE
 )
 }
