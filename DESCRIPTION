@@ -1,0 +1,19 @@
+Package: aceDLNM
+Type: Package
+Title: Fit Adaptive Cumulative Exposure Distributed Lag Non-Linear Models (ACE-DLNM)
+Version: 1.0.1
+Author: Tianyi Pan
+Maintainer: Tianyi Pan <tianyi.pan@uwaterloo.ca>
+Description: R package for fittting adaptive cumulative exposure distributed lag non-Linear models (ace-dlnm) and reportting the results. 
+License: GPL (>= 3)
+Encoding: UTF-8
+Imports: 
+    Rcpp (>= 1.0.12),
+    RcppEigen,
+    Matrix,
+    mgcv,
+		ggplot2,
+		dplyr
+LinkingTo: Rcpp, RcppEigen
+RoxygenNote: 7.2.3
+LazyData: true
