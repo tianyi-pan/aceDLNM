@@ -2374,14 +2374,16 @@ List aceDLNMCI(const Eigen::VectorXd R_y,
                         Named("alpha_f_sample") = alpha_f_sample_mat,
                         Named("betaR_sample") = betaR_sample_mat,
                         Named("betaF_sample") = betaF_sample_mat,
-                        Named("eta_sample_mat") = eta_sample_mat);
+                        Named("eta_sample_mat") = eta_sample_mat,
+                        Named("Hessian_inner") = R_he);
   } else {
     return List::create(Named("phi_sample") = phi_sample_mat,
                       Named("alpha_w_sample") = alpha_w_sample_mat,
                       Named("alpha_f_sample") = alpha_f_sample_mat,
                       Named("betaR_sample") = betaR_sample_mat,
                       Named("betaF_sample") = betaF_sample_mat,
-                      Named("eta_sample_mat") = eta_sample_mat);
+                      Named("eta_sample_mat") = eta_sample_mat,
+                      Named("Hessian_inner") = R_he);
   }
 
 }
@@ -4224,13 +4226,15 @@ List aceDLNMCI_nosmooth(const Eigen::VectorXd R_y,
     return List::create(Named("alpha_w_sample") = alpha_w_sample_mat,
                         Named("alpha_f_sample") = alpha_f_sample_mat,
                         Named("betaF_sample") = betaF_sample_mat,
-                        Named("eta_sample_mat") = eta_sample_mat);
+                        Named("eta_sample_mat") = eta_sample_mat,
+                        Named("Hessian_inner") = R_he);
   } else {
     return List::create(Named("phi_sample") = phi_sample_mat,
                       Named("alpha_w_sample") = alpha_w_sample_mat,
                       Named("alpha_f_sample") = alpha_f_sample_mat,
                       Named("betaF_sample") = betaF_sample_mat,
-                      Named("eta_sample_mat") = eta_sample_mat);
+                      Named("eta_sample_mat") = eta_sample_mat,
+                      Named("Hessian_inner") = R_he);
   }
 
 }

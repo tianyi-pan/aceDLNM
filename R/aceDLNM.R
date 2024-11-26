@@ -605,6 +605,10 @@ aceDLNM <- function(formula,
       }
     )
 
+  } else {
+    for (i in 1:length(par.start)) {
+      if((par.start[i] > (upper.bound[i] - 1)) | (par.start[i] < lower.bound[i])) par.start[i] <- 7
+    }
   }
   success <- FALSE
   itrtry <- 0
@@ -905,6 +909,11 @@ aceDLNM <- function(formula,
       out$suggest.step <- suggest.step
       if(verbose) cat("finish obtain Hessian matrix. \n")
     }
+    out$det_Hessian_inner <- determinant(as.matrix(sampled$Hessian_inner[1:kE, 1:kE]), logarithm = TRUE)
+    if((out$det_Hessian_inner$modulus < log(0.001)) | (out$det_Hessian_inner$sign < 0)) {
+      cat("The optimization algorithm might not converge. Try rerunning the model with par.start = ", c(out$opt$par - out$suggest.step), "\n")
+    }
+    
   }
 
   structure(out, class = "aceDLNM_fit") # S3 class
