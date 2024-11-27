@@ -875,7 +875,9 @@ aceDLNM <- function(formula,
   out$opttime <- opttime
   out$penalty <- "second"
   out$interpolate <- interpolate
-
+  
+  ## check convergence
+  out$eigval_Hessian_inner <- eigen(sampled$Hessian_inner)$values
   ## check convergence of BFGS
   if(check.BFGS) {
     if(is.null(opt.LAML$hessian)){
@@ -908,12 +910,17 @@ aceDLNM <- function(formula,
 
       out$suggest.step <- suggest.step
       if(verbose) cat("finish obtain Hessian matrix. \n")
-    }
-    out$det_Hessian_inner <- determinant(as.matrix(sampled$Hessian_inner[1:kE, 1:kE]), logarithm = TRUE)
-    if((out$det_Hessian_inner$modulus < log(0.001)) | (out$det_Hessian_inner$sign < 0)) {
-      cat("The optimization algorithm might not converge. Try rerunning the model with par.start = ", c(out$opt$par - out$suggest.step), "\n")
+      if( sqrt(sum((out$env$gr)^2)) > 0.2) cat("BFGS might not converge. You could try other par.start and rerun the model.")
     }
     
+    if(min(out$eigval_Hessian_inner) < 0.01) {
+      warning("The optimization algorithm might not converge. Try rerunning the model with par.start = ", c(out$opt$par - out$suggest.step), "\n")
+    }
+    
+  } else {
+    if(min(out$eigval_Hessian_inner) < 0.01) {
+      warning("The optimization algorithm might not converge. Try rerunning the model with par.start = ", c(out$opt$par), "\n")
+    }
   }
 
   structure(out, class = "aceDLNM_fit") # S3 class
