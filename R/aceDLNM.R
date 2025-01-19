@@ -382,7 +382,7 @@ aceDLNM <- function(formula,
 
   ## 2.4 offset
   if(!is.null(offset)) {
-    Xoffset <- log(as.vector(stats::model.matrix(offset,data=sXdat)[,-1,drop=F]))
+    Xoffset <- as.vector(stats::model.matrix(offset,data=sXdat)[,-1,drop=F])
   } else {
     Xoffset <- as.vector(rep(0, nrow(sXdat)))
   }
@@ -614,12 +614,12 @@ aceDLNM <- function(formula,
         }
         if(verbose) cat("Use results from mgcv::bam with same-day exposure as the initial guess for BFGS. \n ")
       },
-      warning = function(w) {
-        if(verbose) {
-          cat("some warnings from bam() for setting the initial guess. Its influence on the model fitting is ignorable, but you can set par.start by hand. \n")
-          warning(w)
-        }
-      },
+      # warning = function(w) {
+      #   if(verbose) {
+      #     cat("some warnings from bam() for setting the initial guess. Its influence on the model fitting is ignorable, but you can set par.start by hand. \n")
+      #     warning(w)
+      #   }
+      # },
       error = function(e) {
         cat("use default starting values for BFGS ... \n")
       }
