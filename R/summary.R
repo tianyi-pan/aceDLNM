@@ -325,7 +325,8 @@ summary.aceDLNM_fit <- function(object, E.eval, others.eval = NULL,
 
     # remove re terms
     re_id <- which(unlist(lapply(lapply(SS, attr, "class"), "[[", 1)) == "random.effect")
-    if(length(re_id) >= 1) smooth.df <- dplyr::filter(smooth.df, !var %in% re_id)
+
+    if(length(re_id) >= 1) smooth.df <- dplyr::filter(smooth.df, !var %in% unique(smooth.df$var)[re_id])
 
     out$est$smooth = smooth.df
 
@@ -403,7 +404,7 @@ summary.aceDLNM_fit <- function(object, E.eval, others.eval = NULL,
 
     if(!is.null(object$formula$smooth)) {
       AIC <- ConditionalAIC(object$data$y, object$data$B_inner, object$smooth$fE$knots, SwI, SfI, object$data$Dw,
-                            object$data$Xrand, object$data$Xfix, object$data$Zf %*% object$data$Ufpen, object$data$r,
+                            object$data$Xrand, object$data$Xfix, object$data$Zf %*% object$data$Ufpen, object$data$offset, object$data$r,
                             object$point$alpha_f,
                             object$point$phi,
                             object$point$log_theta,
@@ -413,7 +414,7 @@ summary.aceDLNM_fit <- function(object, E.eval, others.eval = NULL,
                             object$point$log_smoothing)
     } else {
       AIC <- ConditionalAIC_nosmooth(object$data$y, object$data$B_inner, object$smooth$fE$knots, SwI, SfI, object$data$Dw,
-                                     object$data$Xfix, object$data$Zf %*% object$data$Ufpen,
+                                     object$data$Xfix, object$data$Zf %*% object$data$Ufpen, object$data$offset,
                                      object$point$alpha_f,
                                      object$point$phi,
                                      object$point$log_theta,

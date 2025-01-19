@@ -65,6 +65,7 @@ aceDLNM <- function(formula,
                     unpen.smooth = NULL,
                     fe.varying = NULL,
                     fe.cont = NULL,
+                    offset = NULL,
                     dat = NULL,
                     maxL = 14, kw = 20, kE = 20,
                     interpolate = TRUE,
@@ -99,6 +100,10 @@ aceDLNM <- function(formula,
   colnames(sXdat)[which(colnames(sXdat) == sXobject$t)] <- "t"
   colnames(sXdat)[which(colnames(sXdat) == as.character(formula[[2]]))] <- "y"
 
+  ## byvar
+  byvar <- sXobject$by
+
+
   maxLreal <- maxL+1
 
   shift <- min(min(sXdat$x), 0)
@@ -111,16 +116,26 @@ aceDLNM <- function(formula,
   ### CONSTRUCTIONS #######
   ## time non-varying for group
   if(length(unique(sXdat$t)) < nrow(sXdat)) {
-    if(is.null(fe.cont)) stop("The exposure process data are duplicated at some time point. Please provide fe.cout.")
-    # group <- stats::model.matrix(fe.cont,data=sXdat)[,-1,drop=FALSE]
-    ## remove the intercept
-    # if (any(apply(group,2,function(x) all(x==1)))) group <- group[,-(apply(group,2,function(x) all(x==1)))]
-    group_name <- fe.cont[[2]]
-    if(length(group_name) >= 2) {
-      group_name <- as.character(group_name[2:length(group_name)])
+
+    if(is.null(fe.cont) & is.null(byvar)) stop("The exposure process data are duplicated at some time point. Please provide fe.cout.")
+
+    if(!is.null(fe.cont)){
+      group_name.fe.cont <- fe.cont[[2]]
+      if(length(group_name.fe.cont) >= 2) {
+        group_name.fe.cont <- as.character(group_name.fe.cont[2:length(group_name.fe.cont)])
+      } else {
+        group_name.fe.cont <- as.character(group_name.fe.cont)
+      }
     } else {
-      group_name <- as.character(group_name)
+      group_name.fe.cont <- NULL
     }
+    if(!is.null(byvar)) {
+      group_name.byvar <- byvar
+    } else {
+      group_name.byvar <- NULL
+    }
+
+    group_name <- c(group_name.fe.cont, group_name.byvar)
 
     ## split data
     sXdatlist <- split(as.data.table(sXdat), by = group_name) # use split in data.table to preserve order
@@ -365,7 +380,12 @@ aceDLNM <- function(formula,
 
   ### END following https://github.com/awstringer1/mam/blob/master/R/mam.R #######
 
-
+  ## 2.4 offset
+  if(!is.null(offset)) {
+    Xoffset <- log(as.vector(stats::model.matrix(offset,data=sXdat)[,-1,drop=F]))
+  } else {
+    Xoffset <- as.vector(rep(0, nrow(sXdat)))
+  }
   ### Model Fitting
 
   N <- nrow(sXdat)
@@ -497,7 +517,7 @@ aceDLNM <- function(formula,
         betaR.init <- LAMLenv$mod$betaR.mod
         if(any(is.nan(betaF.init))) betaR.init <- betaR.init.default
         LAML.results <- aceDLNMopt(y, B_inner, SSf$knots, SwI, SfI, Dw,
-                                      Xrand, Xfix, Zfnew, r,
+                                      Xrand, Xfix, Zfnew, Xoffset, r,
                                       alpha_f.init,
                                       phi.init,
                                       log_theta.given, log_smoothing_f.given, log_smoothing_w.given,
@@ -512,7 +532,7 @@ aceDLNM <- function(formula,
         LAMLenv$gr <<- LAML.results$LAML.gradient
       } else {
         LAML.results <- aceDLNMopt_nosmooth(y, B_inner, SSf$knots, SwI, SfI, Dw,
-                                               Xfix, Zfnew,
+                                               Xfix, Zfnew, Xoffset,
                                                alpha_f.init,
                                                phi.init,
                                                log_theta.given, log_smoothing_f.given, log_smoothing_w.given,
@@ -793,7 +813,7 @@ aceDLNM <- function(formula,
   }
   if(model.choice == "with.smooth") {
     sampled <- aceDLNMCI(y, B_inner, SSf$knots, SwI, SfI, Dw,
-                            Xrand, Xfix, Zfnew, r,
+                            Xrand, Xfix, Zfnew, Xoffset, r,
                             LAMLenv$mod$alpha_f.mod,
                             phi.opt,
                             log_theta.opt, log_smoothing_f.opt, log_smoothing_w.opt,
@@ -802,7 +822,7 @@ aceDLNM <- function(formula,
                             eta, delta.method, verbose)
   } else {
     sampled <- aceDLNMCI_nosmooth(y, B_inner, SSf$knots, SwI, SfI, Dw,
-                                      Xfix, Zfnew,
+                                      Xfix, Zfnew, Xoffset,
                                      LAMLenv$mod$alpha_f.mod,
                                       phi.opt,
                                       log_theta.opt, log_smoothing_f.opt, log_smoothing_w.opt,
@@ -858,6 +878,7 @@ aceDLNM <- function(formula,
   out$data$Uwpen = Uwpen
   out$data$kx.per500 = kx.per500
   out$data$shift = shift
+  out$data$offset = Xoffset
   if(model.choice == "with.smooth") {
     out$data$Xrand = Xrand
     out$data$UR = UR
@@ -875,7 +896,7 @@ aceDLNM <- function(formula,
   out$opttime <- opttime
   out$penalty <- "second"
   out$interpolate <- interpolate
-  
+
   ## check convergence
   out$eigval_Hessian_inner <- eigen(sampled$Hessian_inner)$values
   ## check convergence of BFGS
@@ -912,11 +933,11 @@ aceDLNM <- function(formula,
       if(verbose) cat("finish obtain Hessian matrix. \n")
       if( sqrt(sum((out$env$gr)^2)) > 0.2) cat("BFGS might not converge. You could try other par.start and rerun the model.")
     }
-    
+
     if(min(out$eigval_Hessian_inner) < 0.01) {
       warning("The optimization algorithm might not converge. Try rerunning the model with par.start = ", c(out$opt$par - out$suggest.step), "\n")
     }
-    
+
   } else {
     if(min(out$eigval_Hessian_inner) < 0.01) {
       warning("The optimization algorithm might not converge. Try rerunning the model with par.start = ", c(out$opt$par), "\n")

@@ -347,6 +347,8 @@ private:
 
   const Mat& Zf;
 
+  const Vec& Xoffset; // offset
+
 public:
   int n;
   int kw;
@@ -379,7 +381,7 @@ public:
   Vec E;
   Vec eta;
   Vec eta_remaining; // remaining terms = Xfix * betaF + Xrand * betaR
-  Vec mu; // log(mu) = eta + eta_remaining
+  Vec mu; // log(mu) = eta + eta_remaining + Xoffset
   Scalar NegLogL; // NegativeLogLikelihood value
 
 
@@ -478,6 +480,7 @@ public:
         const Mat& Xrand_,
         const Mat& Xfix_,
         const Mat& Zf_,
+        const Vec& Xoffset_,
         const Vec& r_,
         Vec& alpha_f_,
         Vec& phi_,
@@ -487,7 +490,7 @@ public:
         Vec& betaR_,
         Vec& betaF_,
         Vec& logsmoothing_) :
-    y(y_), B_inner(B_inner_), knots_f(knots_f_), Sw(Sw_), Sf(Sf_), Dw(Dw_), Xrand(Xrand_), Xfix(Xfix_), Zf(Zf_), r(r_),
+    y(y_), B_inner(B_inner_), knots_f(knots_f_), Sw(Sw_), Sf(Sf_), Dw(Dw_), Xrand(Xrand_), Xfix(Xfix_), Zf(Zf_), Xoffset(Xoffset_), r(r_),
     alpha_f(alpha_f_), phi(phi_), log_theta(log_theta_), log_smoothing_f(log_smoothing_f_), log_smoothing_w(log_smoothing_w_), betaR(betaR_), betaF(betaF_), logsmoothing(logsmoothing_) {
 
       n = y.size(); // sample size
@@ -527,7 +530,7 @@ public:
         Bf_matrix.row(i) = Bf;
         eta(i) = Bf.dot(alpha_f);
         eta_remaining(i) = Xfix.row(i).dot(betaF) + Xrand.row(i).dot(betaR);
-        mu(i) = exp(eta(i) + eta_remaining(i));
+        mu(i) = exp(eta(i) + eta_remaining(i) + Xoffset(i));
       }
 
       // Initialize the derivative components and NegativeLogLikelihood
@@ -556,7 +559,7 @@ public:
 
     for (int i = 0; i < n; i++) {
       eta(i) = Bf_matrix.row(i).dot(alpha_f);
-      mu(i) = exp(eta(i) + eta_remaining(i));
+      mu(i) = exp(eta(i) + eta_remaining(i) + Xoffset(i));
     }
   }
 
@@ -577,7 +580,7 @@ public:
       Bf = BsplinevecCon(E(i), knots_f, 4, Zf);
       Bf_matrix.row(i) = Bf;
       eta(i) = Bf.dot(alpha_f);
-      mu(i) = exp(eta(i) + eta_remaining(i));
+      mu(i) = exp(eta(i) + eta_remaining(i) + Xoffset(i));
     }
 
     dw_dphi_mat = dw_dphi(); // d alpha_w / d phi
@@ -587,14 +590,14 @@ public:
     betaF = betaF_;
     for (int i = 0; i < n; i++) {
       eta_remaining(i) = Xfix.row(i).dot(betaF) + Xrand.row(i).dot(betaR);
-      mu(i) = exp(eta(i) + eta_remaining(i));
+      mu(i) = exp(eta(i) + eta_remaining(i) + Xoffset(i));
     }
   }
   void setBetaR(const Vec betaR_) {
     betaR = betaR_;
     for (int i = 0; i < n; i++) {
       eta_remaining(i) = Xfix.row(i).dot(betaF) + Xrand.row(i).dot(betaR);
-      mu(i) = exp(eta(i) + eta_remaining(i));
+      mu(i) = exp(eta(i) + eta_remaining(i) + Xoffset(i));
     }
   }
   void setLogTheta(const Scalar log_theta_) {
@@ -804,7 +807,7 @@ public:
     for (int i = 0; i < n; i++) {
       loglik += lanczos_lgamma(y(i) + theta) - lanczos_lgamma(theta) - lanczos_lgamma(y(i) + 1) -
                                     theta * log(1 + mu(i)/theta) +
-                                    y(i)*( eta(i) + eta_remaining(i) - log_theta - log(1 + mu(i)/theta) );
+                                    y(i)*( eta(i) + eta_remaining(i) + Xoffset(i) - log_theta - log(1 + mu(i)/theta) );
     }
     // part 1: DLNM
     // Smooth Penalty
@@ -2101,6 +2104,7 @@ List aceDLNMopt(const Eigen::VectorXd R_y,
                    const Eigen::MatrixXd R_Xrand,
                    const Eigen::MatrixXd R_Xfix,
                    const Eigen::MatrixXd R_Zf,
+                   const Eigen::VectorXd R_Xoffset,
                    const Eigen::VectorXd R_r,
                    Eigen::VectorXd R_alpha_f,
                    Eigen::VectorXd R_phi,
@@ -2121,6 +2125,7 @@ List aceDLNMopt(const Eigen::VectorXd R_y,
     Mat Xrand = R_Xrand.cast<Scalar>();
     Mat Xfix = R_Xfix.cast<Scalar>();
     Mat Zf = R_Zf.cast<Scalar>();
+    Vec Xoffset = R_Xoffset.cast<Scalar>();
     Vec r = R_r.cast<Scalar>();
     Vec alpha_f = R_alpha_f.cast<Scalar>();
     Vec phi = R_phi.cast<Scalar>();
@@ -2133,7 +2138,7 @@ List aceDLNMopt(const Eigen::VectorXd R_y,
 
     // construct model
     Model modelobj(y, B_inner, knots_f, Sw, Sf, Dw,
-                   Xrand, Xfix, Zf, r,
+                   Xrand, Xfix, Zf, Xoffset, r,
                    alpha_f, phi, log_theta, log_smoothing_f, log_smoothing_w,
                    betaR, betaF, logsmoothing);
      // Inner opt
@@ -2163,6 +2168,7 @@ List aceDLNMCI(const Eigen::VectorXd R_y,
                   const Eigen::MatrixXd R_Xrand,
                   const Eigen::MatrixXd R_Xfix,
                   const Eigen::MatrixXd R_Zf,
+                  const Eigen::VectorXd R_Xoffset,
                   const Eigen::VectorXd R_r,
                   Eigen::VectorXd R_alpha_f,
                   Eigen::VectorXd R_phi,
@@ -2187,6 +2193,7 @@ List aceDLNMCI(const Eigen::VectorXd R_y,
   Mat Xrand = R_Xrand.cast<Scalar>();
   Mat Xfix = R_Xfix.cast<Scalar>();
   Mat Zf = R_Zf.cast<Scalar>();
+  Vec Xoffset = R_Xoffset.cast<Scalar>();
   Vec r = R_r.cast<Scalar>();
   Vec alpha_f = R_alpha_f.cast<Scalar>();
   Vec phi = R_phi.cast<Scalar>();
@@ -2201,7 +2208,7 @@ List aceDLNMCI(const Eigen::VectorXd R_y,
 
   // construct model
   Model modelobj(y, B_inner, knots_f, Sw, Sf, Dw,
-                  Xrand, Xfix, Zf, r,
+                  Xrand, Xfix, Zf, Xoffset, r,
                   alpha_f, phi, log_theta, log_smoothing_f, log_smoothing_w,
                   betaR, betaF, logsmoothing);
 
@@ -2357,7 +2364,7 @@ List aceDLNMCI(const Eigen::VectorXd R_y,
     if(ifeta) {
       E = B_inner * R_alpha_w_sample.cast<Scalar>();
       for (int ii = 0; ii < n; ii++) {
-        eta_sample(ii) = BsplinevecCon(E(ii), knots_f, 4, Zf).dot(R_alpha_f_sample.cast<Scalar>()) + Xfix.row(ii).dot(R_betaF_sample.cast<Scalar>()) + Xrand.row(ii).dot(R_betaR_sample.cast<Scalar>());
+        eta_sample(ii) = BsplinevecCon(E(ii), knots_f, 4, Zf).dot(R_alpha_f_sample.cast<Scalar>()) + Xfix.row(ii).dot(R_betaF_sample.cast<Scalar>()) + Xrand.row(ii).dot(R_betaR_sample.cast<Scalar>()) + Xoffset(ii);
       }
       R_eta_sample = eta_sample.cast<double>();
       eta_sample_mat.row(i) = R_eta_sample.transpose();
@@ -2400,6 +2407,7 @@ List ConditionalAIC(const Eigen::VectorXd R_y,
                       const Eigen::MatrixXd R_Xrand,
                       const Eigen::MatrixXd R_Xfix,
                       const Eigen::MatrixXd R_Zf,
+                      const Eigen::VectorXd R_Xoffset,
                       const Eigen::VectorXd R_r,
                       Eigen::VectorXd R_alpha_f,
                       Eigen::VectorXd R_phi,
@@ -2419,6 +2427,7 @@ List ConditionalAIC(const Eigen::VectorXd R_y,
   Mat Xrand = R_Xrand.cast<Scalar>();
   Mat Xfix = R_Xfix.cast<Scalar>();
   Mat Zf = R_Zf.cast<Scalar>();
+  Vec Xoffset = R_Xoffset.cast<Scalar>();
   Vec r = R_r.cast<Scalar>();
   Vec alpha_f = R_alpha_f.cast<Scalar>();
   Vec phi = R_phi.cast<Scalar>();
@@ -2433,7 +2442,7 @@ List ConditionalAIC(const Eigen::VectorXd R_y,
 
   // construct model
   Model modelobj(y, B_inner, knots_f, Sw, Sf, Dw,
-                  Xrand, Xfix, Zf, r,
+                  Xrand, Xfix, Zf, Xoffset, r,
                   alpha_f, phi, log_theta, log_smoothing_f, log_smoothing_w,
                   betaR, betaF, logsmoothing);
   modelobj.prepare_AIC();
@@ -2472,6 +2481,8 @@ private:
 
   const Mat& Xfix; // fixed effects
   const Mat& Zf; // for point contraint in f(E)
+  
+  const Vec& Xoffset; // offset
 
 public:
   int n;
@@ -2585,13 +2596,14 @@ public:
         const Mat& Dw_,
         const Mat& Xfix_,
         const Mat& Zf_,
+        const Vec& Xoffset_,
         Vec& alpha_f_,
         Vec& phi_,
         Scalar log_theta_,
         Scalar log_smoothing_f_,
         Scalar log_smoothing_w_,
         Vec& betaF_) :
-    y(y_), B_inner(B_inner_), knots_f(knots_f_), Sw(Sw_), Sf(Sf_), Dw(Dw_), Xfix(Xfix_), Zf(Zf_),
+    y(y_), B_inner(B_inner_), knots_f(knots_f_), Sw(Sw_), Sf(Sf_), Dw(Dw_), Xfix(Xfix_), Zf(Zf_), Xoffset(Xoffset_),
     alpha_f(alpha_f_), phi(phi_), log_theta(log_theta_), log_smoothing_f(log_smoothing_f_), log_smoothing_w(log_smoothing_w_), betaF(betaF_) {
 
       n = y.size(); // sample size
@@ -2624,7 +2636,7 @@ public:
         Bf_matrix.row(i) = Bf;
         eta(i) = Bf.dot(alpha_f);
         eta_remaining(i) = Xfix.row(i).dot(betaF);
-        mu(i) = exp(eta(i) + eta_remaining(i));
+        mu(i) = exp(eta(i) + eta_remaining(i) + Xoffset(i));
       }
 
       // Initialize the derivative components and NegativeLogLikelihood
@@ -2655,7 +2667,7 @@ public:
 
     for (int i = 0; i < n; i++) {
       eta(i) = Bf_matrix.row(i).dot(alpha_f);
-      mu(i) = exp(eta(i) + eta_remaining(i));
+      mu(i) = exp(eta(i) + eta_remaining(i) + Xoffset(i));
     }
   }
 
@@ -2676,7 +2688,7 @@ public:
       Bf = BsplinevecCon(E(i), knots_f, 4, Zf);
       Bf_matrix.row(i) = Bf;
       eta(i) = Bf.dot(alpha_f);
-      mu(i) = exp(eta(i) + eta_remaining(i));
+      mu(i) = exp(eta(i) + eta_remaining(i) + Xoffset(i));
     }
 
     dw_dphi_mat = dw_dphi(); // d alpha_w / d phi
@@ -2687,7 +2699,7 @@ public:
     betaF = betaF_;
     for (int i = 0; i < n; i++) {
       eta_remaining(i) = Xfix.row(i).dot(betaF);
-      mu(i) = exp(eta(i) + eta_remaining(i));
+      mu(i) = exp(eta(i) + eta_remaining(i) + Xoffset(i));
     }
   }
 
@@ -2854,7 +2866,7 @@ public:
     for (int i = 0; i < n; i++) {
       loglik += lanczos_lgamma(y(i) + theta) - lanczos_lgamma(theta) - lanczos_lgamma(y(i) + 1) -
                                    theta * log(1 + mu(i)/theta) +
-                                   y(i)*( eta(i) + eta_remaining(i) - log_theta - log(1 + mu(i)/theta) );
+                                   y(i)*( eta(i) + eta_remaining(i) + Xoffset(i) - log_theta - log(1 + mu(i)/theta) );
     }
     // part 1: DLNM
     // Smooth Penalty
@@ -2875,7 +2887,7 @@ public:
     for (int i = 0; i < n; i++) {
       loglik += lanczos_lgamma(y(i) + theta) - lanczos_lgamma(theta) - lanczos_lgamma(y(i) + 1) -
                                     theta * log(1 + mu(i)/theta) +
-                                    y(i)*( eta(i) + eta_remaining(i) - log_theta - log(1 + mu(i)/theta) );
+                                    y(i)*( eta(i) + eta_remaining(i) + Xoffset(i) - log_theta - log(1 + mu(i)/theta) );
     }
 
     NegLogL_l = -1.0 * loglik; // NEGATIVE log-likelihood
@@ -3978,6 +3990,7 @@ List aceDLNMopt_nosmooth(const Eigen::VectorXd R_y,
                             const Eigen::MatrixXd R_Dw,
                             const Eigen::MatrixXd R_Xfix,
                             const Eigen::MatrixXd R_Zf,
+                            const Eigen::VectorXd R_Xoffset,
                             Eigen::VectorXd R_alpha_f,
                             Eigen::VectorXd R_phi,
                             double R_log_theta,
@@ -3994,6 +4007,7 @@ List aceDLNMopt_nosmooth(const Eigen::VectorXd R_y,
     Mat Dw = R_Dw.cast<Scalar>();
     Mat Xfix = R_Xfix.cast<Scalar>();
     Mat Zf = R_Zf.cast<Scalar>();
+    Vec Xoffset = R_Xoffset.cast<Scalar>();
     Vec alpha_f = R_alpha_f.cast<Scalar>();
     Vec phi = R_phi.cast<Scalar>();
     Scalar log_theta = R_log_theta;
@@ -4002,7 +4016,7 @@ List aceDLNMopt_nosmooth(const Eigen::VectorXd R_y,
     Vec betaF = R_betaF.cast<Scalar>();
 
     // construct model
-    Model_nosmooth modelobj(y, B_inner, knots_f, Sw, Sf, Dw, Xfix, Zf, alpha_f, phi, log_theta, log_smoothing_f, log_smoothing_w, betaF);
+    Model_nosmooth modelobj(y, B_inner, knots_f, Sw, Sf, Dw, Xfix, Zf, Xoffset, alpha_f, phi, log_theta, log_smoothing_f, log_smoothing_w, betaF);
 
 
      // Inner opt
@@ -4029,6 +4043,7 @@ List aceDLNMCI_nosmooth(const Eigen::VectorXd R_y,
                            const Eigen::MatrixXd R_Dw,
                            const Eigen::MatrixXd R_Xfix,
                            const Eigen::MatrixXd R_Zf,
+                           const Eigen::VectorXd R_Xoffset,
                            Eigen::VectorXd R_alpha_f,
                            Eigen::VectorXd R_phi,
                            double R_log_theta,
@@ -4049,6 +4064,7 @@ List aceDLNMCI_nosmooth(const Eigen::VectorXd R_y,
   Mat Dw = R_Dw.cast<Scalar>();
   Mat Xfix = R_Xfix.cast<Scalar>();
   Mat Zf = R_Zf.cast<Scalar>();
+  Vec Xoffset = R_Xoffset.cast<Scalar>();
   Vec alpha_f = R_alpha_f.cast<Scalar>();
   Vec phi = R_phi.cast<Scalar>();
   Scalar log_theta = R_log_theta;
@@ -4057,7 +4073,7 @@ List aceDLNMCI_nosmooth(const Eigen::VectorXd R_y,
   Vec betaF = R_betaF.cast<Scalar>();
 
   // construct model
-  Model_nosmooth modelobj(y, B_inner, knots_f, Sw, Sf, Dw, Xfix, Zf, alpha_f, phi, log_theta, log_smoothing_f, log_smoothing_w, betaF);
+  Model_nosmooth modelobj(y, B_inner, knots_f, Sw, Sf, Dw, Xfix, Zf, Xoffset, alpha_f, phi, log_theta, log_smoothing_f, log_smoothing_w, betaF);
 
   int kw = modelobj.kw;
   int kE = modelobj.kE;
@@ -4210,7 +4226,7 @@ List aceDLNMCI_nosmooth(const Eigen::VectorXd R_y,
     if(ifeta) {
       E = B_inner * R_alpha_w_sample.cast<Scalar>();
       for (int ii = 0; ii < n; ii++) {
-        eta_sample(ii) = BsplinevecCon(E(ii), knots_f, 4, Zf).dot(R_alpha_f_sample.cast<Scalar>()) + Xfix.row(ii).dot(R_betaF_sample.cast<Scalar>());
+        eta_sample(ii) = BsplinevecCon(E(ii), knots_f, 4, Zf).dot(R_alpha_f_sample.cast<Scalar>()) + Xfix.row(ii).dot(R_betaF_sample.cast<Scalar>()) + Xoffset(ii);
       }
       R_eta_sample = eta_sample.cast<double>();
       eta_sample_mat.row(i) = R_eta_sample.transpose();
@@ -4254,6 +4270,7 @@ List ConditionalAIC_nosmooth(const Eigen::VectorXd R_y,
                            const Eigen::MatrixXd R_Dw,
                            const Eigen::MatrixXd R_Xfix,
                            const Eigen::MatrixXd R_Zf,
+                           const Eigen::VectorXd R_Xoffset,
                            Eigen::VectorXd R_alpha_f,
                            Eigen::VectorXd R_phi,
                            double R_log_theta,
@@ -4269,6 +4286,7 @@ List ConditionalAIC_nosmooth(const Eigen::VectorXd R_y,
   Mat Dw = R_Dw.cast<Scalar>();
   Mat Xfix = R_Xfix.cast<Scalar>();
   Mat Zf = R_Zf.cast<Scalar>();
+  Vec Xoffset = R_Xoffset.cast<Scalar>();
   Vec alpha_f = R_alpha_f.cast<Scalar>();
   Vec phi = R_phi.cast<Scalar>();
   Scalar log_theta = R_log_theta;
@@ -4277,7 +4295,7 @@ List ConditionalAIC_nosmooth(const Eigen::VectorXd R_y,
   Vec betaF = R_betaF.cast<Scalar>();
 
   // construct model
-  Model_nosmooth modelobj(y, B_inner, knots_f, Sw, Sf, Dw, Xfix, Zf, alpha_f, phi, log_theta, log_smoothing_f, log_smoothing_w, betaF);
+  Model_nosmooth modelobj(y, B_inner, knots_f, Sw, Sf, Dw, Xfix, Zf, Xoffset, alpha_f, phi, log_theta, log_smoothing_f, log_smoothing_w, betaF);
   modelobj.prepare_AIC();
   // hessian
   Eigen::MatrixXd R_he;

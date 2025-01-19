@@ -2,13 +2,19 @@
 #'
 #' @param x exposure variable
 #' @param t time variable
+#' @param by
 #'
-#' @return a formula for model fitting in \code{aceDLNM}. 
+#' @return a formula for model fitting in \code{aceDLNM}.
 #' @export
-sX <- function(t, x){
+sX <- function(t, x, by){
   xvar <- as.character(substitute(x))
   tvar <- as.character(substitute(t))
-  return(list(x = xvar, t = tvar))
+  if(missingArg(by)) {
+    byvar <- NULL
+  } else{
+    byvar <- as.character(substitute(by))
+  }
+  return(list(x = xvar, t = tvar, by = byvar))
 }
 
 # function from mam https://github.com/awstringer1/mam/blob/master/R/helper.R
