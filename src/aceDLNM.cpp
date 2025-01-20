@@ -838,7 +838,7 @@ public:
     for (int i = 0; i < n; i++) {
       loglik += lanczos_lgamma(y(i) + theta) - lanczos_lgamma(theta) - lanczos_lgamma(y(i) + 1) -
                                     theta * log(1 + mu(i)/theta) +
-                                    y(i)*( eta(i) + eta_remaining(i) - log_theta - log(1 + mu(i)/theta) );
+                                    y(i)*( eta(i) + eta_remaining(i) + Xoffset(i) - log_theta - log(1 + mu(i)/theta) );
     }
 
     NegLogL_l = -1.0 * loglik; // NEGATIVE log-likelihood
@@ -2511,7 +2511,7 @@ public:
   Vec E;
   Vec eta;
   Vec eta_remaining; // remaining terms = Xfix * betaF
-  Vec mu; // log(mu) = eta + eta_remaining
+  Vec mu; // log(mu) = eta + eta_remaining + offset
   Scalar NegLogL; // NegativeLogLikelihood value
 
 

@@ -404,7 +404,7 @@ summary.aceDLNM_fit <- function(object, E.eval, others.eval = NULL,
 
     if(!is.null(object$formula$smooth)) {
       AIC <- ConditionalAIC(object$data$y, object$data$B_inner, object$smooth$fE$knots, SwI, SfI, object$data$Dw,
-                            object$data$Xrand, object$data$Xfix, object$data$Zf %*% object$data$Ufpen, object$data$offset, object$data$r,
+                            object$data$Xrand, object$data$Xfix, object$data$Zf %*% object$data$Ufpen, object$data$offset$Xoffset, object$data$r,
                             object$point$alpha_f,
                             object$point$phi,
                             object$point$log_theta,
@@ -414,7 +414,7 @@ summary.aceDLNM_fit <- function(object, E.eval, others.eval = NULL,
                             object$point$log_smoothing)
     } else {
       AIC <- ConditionalAIC_nosmooth(object$data$y, object$data$B_inner, object$smooth$fE$knots, SwI, SfI, object$data$Dw,
-                                     object$data$Xfix, object$data$Zf %*% object$data$Ufpen, object$data$offset,
+                                     object$data$Xfix, object$data$Zf %*% object$data$Ufpen, object$data$offset$Xoffset,
                                      object$point$alpha_f,
                                      object$point$phi,
                                      object$point$log_theta,

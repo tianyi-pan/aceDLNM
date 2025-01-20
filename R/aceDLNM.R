@@ -197,7 +197,7 @@ aceDLNM <- function(formula,
     t <- sXdati$t
     Nti <- length(y) - maxL
     if((kx.per500 > 300) || (interpolate == TRUE)) {
-      if(verbose) cat("Interpolate the exposure process. \n")
+      # if(verbose) cat("Interpolate the exposure process. \n")
       kx <- Nti+maxL + 4 + 2 # number of knots for X(t)
       # kx <- Nti+maxL + 4 # number of knots for X(t)
       interpolate <- TRUE
@@ -208,7 +208,7 @@ aceDLNM <- function(formula,
     ### 0.1 Model exposure process
     if(verbose) start <- Sys.time()
     if(!interpolate) {
-      if(verbose) cat("Start modelling exposure process ... ", "\n")
+      # if(verbose) cat("Start modelling exposure process ... ", "\n")
       SSx <- mgcv::smoothCon(s(t, bs = "bs", k = kx),
                              absorb.cons = FALSE,
                              data = data.frame(t = t))[[1]] ## reparameterize it later
@@ -240,9 +240,9 @@ aceDLNM <- function(formula,
       alpha_x <- Interpolate(Xsparse, c(rep(0,4), x[1], x, x[length(x)], rep(0,4)))
       # alpha_x <- Interpolate(Xsparse, c(rep(0,4),x,rep(0,4)))
       xt.fit <- "interpolate"
-      if(verbose) cat("modelling exposure process takes: ",
-                      round(difftime(Sys.time(),start,units = 'secs'), 5),
-                      "seconds. \n")
+      # if(verbose) cat("modelling exposure process takes: ",
+      #                 round(difftime(Sys.time(),start,units = 'secs'), 5),
+      #                 "seconds. \n")
     }
 
 
@@ -253,17 +253,17 @@ aceDLNM <- function(formula,
     x <- x[-(1:maxL)] # delete the first maxL days
 
     ### integration
-    if(verbose){
-      cat("Start integration ... ", "\n")
-      start <- Sys.time()
-    }
+    # if(verbose){
+    #   cat("Start integration ... ", "\n")
+    #   start <- Sys.time()
+    # }
     if(!interpolate) {
       integral <- Integral(knots_x, knots_w, kx, kw, maxLreal, Zx, Zwnew, t+0.5, alpha_x, FALSE)
     } else {
       integral <- Integral_interpolate(knots_x, knots_w, kx, kw, maxLreal, Zwnew, t+0.5, alpha_x, FALSE)
     }
-    if(verbose) cat("integration takes: ",
-                    round(difftime(Sys.time(),start,units = 'secs'), 5), "seconds. \n")
+    # if(verbose) cat("integration takes: ",
+    #                 round(difftime(Sys.time(),start,units = 'secs'), 5), "seconds. \n")
 
     ## linear predictor s(t) = f(\int w(l) X(t-l) dl) = f (B_inner(t) %*% alpha_w)
     ## where B_inner(t) = alpha_x %*% D, dim(D) = c(kx, kw), D_{p,q} = \int b_{xp}(t-l)b_{wq}(l) dl.
@@ -382,8 +382,14 @@ aceDLNM <- function(formula,
 
   ## 2.4 offset
   if(!is.null(offset)) {
-    Xoffset <- as.vector(stats::model.matrix(offset,data=sXdat)[,-1,drop=F])
+    Xoffset.original <- as.vector(stats::model.matrix(offset,data=sXdat)[,-1,drop=F])
+    Xoffset.original.min <- min(Xoffset.original)
+    Xoffset.original.max <- max(Xoffset.original)
+    Xoffset <- (Xoffset.original - Xoffset.original.min)/(Xoffset.original.max - Xoffset.original.min)
   } else {
+    Xoffset.original <- as.vector(rep(0, nrow(sXdat)))
+    Xoffset.original.min <- 0
+    Xoffset.original.max <- 0
     Xoffset <- as.vector(rep(0, nrow(sXdat)))
   }
   ### Model Fitting
@@ -878,7 +884,10 @@ aceDLNM <- function(formula,
   out$data$Uwpen = Uwpen
   out$data$kx.per500 = kx.per500
   out$data$shift = shift
-  out$data$offset = Xoffset
+  out$data$offset = list(Xoffset.original = Xoffset.original,
+                         Xoffset.original.min = Xoffset.original.min,
+                         Xoffset.original.max = Xoffset.original.max,
+                         Xoffset = Xoffset)
   if(model.choice == "with.smooth") {
     out$data$Xrand = Xrand
     out$data$UR = UR
