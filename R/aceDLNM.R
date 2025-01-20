@@ -384,12 +384,10 @@ aceDLNM <- function(formula,
   if(!is.null(offset)) {
     Xoffset.original <- as.vector(stats::model.matrix(offset,data=sXdat)[,-1,drop=F])
     Xoffset.original.min <- min(Xoffset.original)
-    Xoffset.original.max <- max(Xoffset.original)
-    Xoffset <- (Xoffset.original - Xoffset.original.min)/(Xoffset.original.max - Xoffset.original.min)
+    Xoffset <- Xoffset.original - Xoffset.original.min
   } else {
     Xoffset.original <- as.vector(rep(0, nrow(sXdat)))
     Xoffset.original.min <- 0
-    Xoffset.original.max <- 0
     Xoffset <- as.vector(rep(0, nrow(sXdat)))
   }
   ### Model Fitting
@@ -886,7 +884,6 @@ aceDLNM <- function(formula,
   out$data$shift = shift
   out$data$offset = list(Xoffset.original = Xoffset.original,
                          Xoffset.original.min = Xoffset.original.min,
-                         Xoffset.original.max = Xoffset.original.max,
                          Xoffset = Xoffset)
   if(model.choice == "with.smooth") {
     out$data$Xrand = Xrand
