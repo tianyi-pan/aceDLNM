@@ -840,7 +840,7 @@ aceDLNM <- function(formula,
   eta1 <- as.vector(t(Bf) %*% out$point$alpha_f)
   eta2 <- as.vector(Xfix %*% out$point$betaF)
   if(exists("Xrand")) eta2 <- eta2 + as.vector(Xrand %*% out$point$betaR)
-  eta.est <- eta1+eta2
+  eta.est <- eta1+eta2 + Xoffset
   out$eta = data.frame(est = eta.est)
 
   if(eta) {
