@@ -399,14 +399,14 @@ public:
   Mat dw_dphi_mat;
   Vec gr_alpha_w_vec;
   Vec d2logdensity_dmudmu_vec;
-  std::vector<Mat> d2mu_dfdf_list;
-  std::vector<Mat> d2mu_dbetaRdbetaR_list;
-  std::vector<Mat> d2mu_dbetaFdbetaF_list;
-  std::vector<Mat> d2logmu_dwdw_list;
-  std::vector<Mat> d2mu_dwdw_list;
+  // std::vector<Mat> d2mu_dfdf_list;
+  // std::vector<Mat> d2mu_dbetaRdbetaR_list;
+  // std::vector<Mat> d2mu_dbetaFdbetaF_list;
+  // std::vector<Mat> d2logmu_dwdw_list;
+  // std::vector<Mat> d2mu_dwdw_list;
   std::vector<Mat> d2w_dphidphi_list;
-  std::vector<Mat> d2logmu_dfdw_list;
-  std::vector<Mat> d2mu_dfdw_list;
+  // std::vector<Mat> d2logmu_dfdw_list;
+  // std::vector<Mat> d2mu_dfdw_list;
   Mat he_alpha_w_mat;
   Mat he_alpha_f_alpha_w_mat;
   Scalar dlogdensity_dtheta_scalar;
@@ -647,14 +647,14 @@ public:
     dmu_dw_mat = dmu_dw();
     gr_alpha_w_vec = gr_alpha_w();
     d2logdensity_dmudmu_vec = d2logdensity_dmudmu();
-    d2mu_dfdf_list = d2mu_dfdf();
-    d2mu_dbetaRdbetaR_list = d2mu_dbetaRdbetaR();
-    d2mu_dbetaFdbetaF_list = d2mu_dbetaFdbetaF();
-    d2logmu_dwdw_list = d2logmu_dwdw();
-    d2mu_dwdw_list = d2mu_dwdw();
+    // d2mu_dfdf_list = d2mu_dfdf();
+    // d2mu_dbetaRdbetaR_list = d2mu_dbetaRdbetaR();
+    // d2mu_dbetaFdbetaF_list = d2mu_dbetaFdbetaF();
+    // d2logmu_dwdw_list = d2logmu_dwdw();
+    // d2mu_dwdw_list = d2mu_dwdw();
     he_alpha_w_mat = he_alpha_w();
-    d2logmu_dfdw_list = d2logmu_dfdw();
-    d2mu_dfdw_list = d2mu_dfdw();
+    // d2logmu_dfdw_list = d2logmu_dfdw();
+    // d2mu_dfdw_list = d2mu_dfdw();
     he_alpha_f_alpha_w_mat = he_alpha_f_alpha_w();
     dlogdensity_dtheta_scalar = dlogdensity_dtheta();
     // d2logdensity_dthetadtheta_scalar = d2logdensity_dthetadtheta();
@@ -767,9 +767,9 @@ public:
     dmu_dbetaR_mat = dmu_dbetaR();
     dmu_dbetaF_mat = dmu_dbetaF();
     d2logdensity_dmudmu_vec = d2logdensity_dmudmu();
-    d2mu_dfdf_list = d2mu_dfdf();
-    d2mu_dbetaRdbetaR_list = d2mu_dbetaRdbetaR();
-    d2mu_dbetaFdbetaF_list = d2mu_dbetaFdbetaF();
+    // d2mu_dfdf_list = d2mu_dfdf();
+    // d2mu_dbetaRdbetaR_list = d2mu_dbetaRdbetaR();
+    // d2mu_dbetaFdbetaF_list = d2mu_dbetaFdbetaF();
 
     gr_alpha_f_vec = gr_alpha_f();
     gr_betaR_vec = gr_betaR();
@@ -964,64 +964,69 @@ public:
     }
     return out;
   }
+
+
+  // remove these lists. Less memory usage. 
+
   // d^2 mu / d alpha_f^2
-  std::vector<Mat> d2mu_dfdf () {
-    std::vector<Mat> out;
-    for (int i = 0; i < n; i++) {
-      out.push_back(mu(i) * dlogmu_df_mat.row(i).transpose() * dlogmu_df_mat.row(i));
-    }
-    return out;
-  }
+  // std::vector<Mat> d2mu_dfdf () {
+  //   std::vector<Mat> out;
+  //   for (int i = 0; i < n; i++) {
+  //     out.push_back(mu(i) * dlogmu_df_mat.row(i).transpose() * dlogmu_df_mat.row(i));
+  //   }
+  //   return out;
+  // }
   // d^2 mu / d betaR^2
-  std::vector<Mat> d2mu_dbetaRdbetaR () {
-    std::vector<Mat> out;
-    for (int i = 0; i < n; i++) {
-      out.push_back(mu(i) * dlogmu_dbetaR_mat.row(i).transpose() * dlogmu_dbetaR_mat.row(i));
-    }
-    return out;
-  }
+  // std::vector<Mat> d2mu_dbetaRdbetaR () {
+  //   std::vector<Mat> out;
+  //   for (int i = 0; i < n; i++) {
+  //     out.push_back(mu(i) * dlogmu_dbetaR_mat.row(i).transpose() * dlogmu_dbetaR_mat.row(i));
+  //   }
+  //   return out;
+  // }
   // d^2 mu / d betaF^2
-  std::vector<Mat> d2mu_dbetaFdbetaF () {
-    std::vector<Mat> out;
-    for (int i = 0; i < n; i++) {
-      out.push_back(mu(i) * dlogmu_dbetaF_mat.row(i).transpose() * dlogmu_dbetaF_mat.row(i));
-    }
-    return out;
-  }
+  // std::vector<Mat> d2mu_dbetaFdbetaF () {
+  //   std::vector<Mat> out;
+  //   for (int i = 0; i < n; i++) {
+  //     out.push_back(mu(i) * dlogmu_dbetaF_mat.row(i).transpose() * dlogmu_dbetaF_mat.row(i));
+  //   }
+  //   return out;
+  // }
   // d^2 log(mu) / d alpha_w^2
-  std::vector<Mat> d2logmu_dwdw () {
-    std::vector<Mat> out;
-    Vec Bf2nd;
-    for (int i = 0; i < n; i++) {
-      Bf2nd = BsplinevecCon2nd(E(i), knots_f, 4, Zf);
-      out.push_back((Bf2nd.dot(alpha_f)) * B_inner.row(i).transpose() * B_inner.row(i));
-    }
-    return out;
-  }
+  // std::vector<Mat> d2logmu_dwdw () {
+  //   std::vector<Mat> out;
+  //   Vec Bf2nd;
+  //   for (int i = 0; i < n; i++) {
+  //     Bf2nd = BsplinevecCon2nd(E(i), knots_f, 4, Zf);
+  //     out.push_back((Bf2nd.dot(alpha_f)) * B_inner.row(i).transpose() * B_inner.row(i));
+  //   }
+  //   return out;
+  // }
   // d^2 mu / d alpha_w^2
-  std::vector<Mat> d2mu_dwdw () {
-    std::vector<Mat> out;
-    for (int i = 0; i < n; i++) {
-      out.push_back(mu(i) * dlogmu_dw_mat.row(i).transpose() * dlogmu_dw_mat.row(i) + mu(i) * d2logmu_dwdw_list.at(i));
-    }
-    return out;
-  }
+  // std::vector<Mat> d2mu_dwdw () {
+  //   std::vector<Mat> out;
+  //   for (int i = 0; i < n; i++) {
+  //     // out.push_back(mu(i) * dlogmu_dw_mat.row(i).transpose() * dlogmu_dw_mat.row(i) + mu(i) * d2logmu_dwdw_list.at(i));
+      // out.push_back(mu(i) * dlogmu_dw_mat.row(i).transpose() * dlogmu_dw_mat.row(i) + mu(i) * (BsplinevecCon2nd(E(i), knots_f, 4, Zf).dot(alpha_f)) * B_inner.row(i).transpose() * B_inner.row(i));
+  //   }
+  //   return out;
+  // }
   // d^2 log(mu) / d alpha_f d alpha_w
-  std::vector<Mat> d2logmu_dfdw () {
-    std::vector<Mat> out;
-    for (int i = 0; i < n; i++) {
-      out.push_back(BsplinevecCon1st(E(i), knots_f, 4, Zf) * B_inner.row(i));
-    }
-    return out;
-  }
+  // std::vector<Mat> d2logmu_dfdw () {
+  //   std::vector<Mat> out;
+  //   for (int i = 0; i < n; i++) {
+  //     out.push_back(BsplinevecCon1st(E(i), knots_f, 4, Zf) * B_inner.row(i));
+  //   }
+  //   return out;
+  // }
   // d^2 mu / d alpha_f d alpha_w
-  std::vector<Mat> d2mu_dfdw () {
-    std::vector<Mat> out;
-    for (int i = 0; i < n; i++) {
-      out.push_back(mu(i) * dlogmu_df_mat.row(i).transpose() * dlogmu_dw_mat.row(i) + mu(i)*d2logmu_dfdw_list.at(i));
-    }
-    return out;
-  }
+  // std::vector<Mat> d2mu_dfdw () {
+  //   std::vector<Mat> out;
+  //   for (int i = 0; i < n; i++) {
+  //     out.push_back(mu(i) * dlogmu_df_mat.row(i).transpose() * dlogmu_dw_mat.row(i) + mu(i)*BsplinevecCon1st(E(i), knots_f, 4, Zf) * B_inner.row(i));
+  //   }
+  //   return out;
+  // }
 
 
 
@@ -1070,6 +1075,9 @@ public:
     }
     return out;
   }
+
+
+
 
   // *** GRADIENT ***
   Vec gr_alpha_f () {
@@ -1141,7 +1149,7 @@ public:
     out2.setZero();
     for (int i = 0; i < n; i++) {
       out1 += d2logdensity_dmudmu_vec(i) * dmu_df_mat.row(i).transpose() * dmu_df_mat.row(i);
-      out2 += dlogdensity_dmu_vec(i) * d2mu_dfdf_list.at(i);
+      out2 += dlogdensity_dmu_vec(i) * (mu(i) * dlogmu_df_mat.row(i).transpose() * dlogmu_df_mat.row(i));
     }
     return - out1 - out2 + smoothing_f*Sf;
   }
@@ -1153,7 +1161,7 @@ public:
     out2.setZero();
     for (int i = 0; i < n; i++) {
       out1 += d2logdensity_dmudmu_vec(i) * dmu_df_mat.row(i).transpose() * dmu_df_mat.row(i);
-      out2 += dlogdensity_dmu_vec(i) * d2mu_dfdf_list.at(i);
+      out2 += dlogdensity_dmu_vec(i) * (mu(i) * dlogmu_df_mat.row(i).transpose() * dlogmu_df_mat.row(i));
     }
     return - out1 - out2;
   }
@@ -1167,7 +1175,7 @@ public:
     Ones.setZero();
     for (int i = 0; i < n; i++) {
       out1 += d2logdensity_dmudmu_vec(i) * dmu_dbetaR_mat.row(i).transpose() * dmu_dbetaR_mat.row(i);
-      out2 += dlogdensity_dmu_vec(i) * d2mu_dbetaRdbetaR_list.at(i);
+      out2 += dlogdensity_dmu_vec(i) * (mu(i) * dlogmu_dbetaR_mat.row(i).transpose() * dlogmu_dbetaR_mat.row(i));
     }
     int begin = 0;
     for (int i = 0; i < p; i++) {
@@ -1188,7 +1196,7 @@ public:
     Ones.setZero();
     for (int i = 0; i < n; i++) {
       out1 += d2logdensity_dmudmu_vec(i) * dmu_dbetaR_mat.row(i).transpose() * dmu_dbetaR_mat.row(i);
-      out2 += dlogdensity_dmu_vec(i) * d2mu_dbetaRdbetaR_list.at(i);
+      out2 += dlogdensity_dmu_vec(i) * (mu(i) * dlogmu_dbetaR_mat.row(i).transpose() * dlogmu_dbetaR_mat.row(i));
     }
     return - out1 - out2;
   }
@@ -1200,10 +1208,11 @@ public:
     out2.setZero();
     for (int i = 0; i < n; i++) {
       out1 += d2logdensity_dmudmu_vec(i) * dmu_dbetaF_mat.row(i).transpose() * dmu_dbetaF_mat.row(i);
-      out2 += dlogdensity_dmu_vec(i) * d2mu_dbetaFdbetaF_list.at(i);
+      out2 += dlogdensity_dmu_vec(i) * (mu(i) * dlogmu_dbetaF_mat.row(i).transpose() * dlogmu_dbetaF_mat.row(i));
     }
     return - out1 - out2;
   }
+
   Mat he_alpha_w () {
     Mat out1(kw, kw);
     Mat out2(kw, kw);
@@ -1211,7 +1220,7 @@ public:
     out2.setZero();
     for (int i = 0; i < n; i++) {
       out1 += d2logdensity_dmudmu_vec(i) * dmu_dw_mat.row(i).transpose() * dmu_dw_mat.row(i);
-      out2 += dlogdensity_dmu_vec(i) * d2mu_dwdw_list.at(i);
+      out2 += dlogdensity_dmu_vec(i) * (mu(i) * dlogmu_dw_mat.row(i).transpose() * dlogmu_dw_mat.row(i) + mu(i) * (BsplinevecCon2nd(E(i), knots_f, 4, Zf).dot(alpha_f)) * B_inner.row(i).transpose() * B_inner.row(i));
     }
     Mat Sw_large(kw, kw);
     Sw_large.setZero();
@@ -1226,7 +1235,7 @@ public:
     out2.setZero();
     for (int i = 0; i < n; i++) {
       out1 += d2logdensity_dmudmu_vec(i) * dmu_dw_mat.row(i).transpose() * dmu_dw_mat.row(i);
-      out2 += dlogdensity_dmu_vec(i) * d2mu_dwdw_list.at(i);
+      out2 += dlogdensity_dmu_vec(i) * (mu(i) * dlogmu_dw_mat.row(i).transpose() * dlogmu_dw_mat.row(i) + mu(i) * (BsplinevecCon2nd(E(i), knots_f, 4, Zf).dot(alpha_f)) * B_inner.row(i).transpose() * B_inner.row(i));
     }
     return - out1 - out2 ;
   }
@@ -1258,7 +1267,7 @@ public:
     out2.setZero();
     for (int i = 0; i < n; i++) {
       out1 += d2logdensity_dmudmu_vec(i) * dmu_df_mat.row(i).transpose() * dmu_dw_mat.row(i);
-      out2 += dlogdensity_dmu_vec(i) * d2mu_dfdw_list.at(i);
+      out2 += dlogdensity_dmu_vec(i) * (mu(i) * dlogmu_df_mat.row(i).transpose() * dlogmu_dw_mat.row(i) + mu(i)*BsplinevecCon1st(E(i), knots_f, 4, Zf) * B_inner.row(i));
     }
     return - out1 - out2;
   }
@@ -1764,6 +1773,7 @@ void Inner(Model& modelobj, bool verbose) {
     int krangemin = 4;
     // int krangemin = 3;
     bool krangewarning = false;
+
     Mat B_inner = modelobj.getB_inner();
     Mat Dw = modelobj.getDw();
     Vec knots_f = modelobj.getknots_f();
@@ -2141,11 +2151,16 @@ List aceDLNMopt(const Eigen::VectorXd R_y,
                    Xrand, Xfix, Zf, Xoffset, r,
                    alpha_f, phi, log_theta, log_smoothing_f, log_smoothing_w,
                    betaR, betaF, logsmoothing);
+    
+
      // Inner opt
     Inner(modelobj, verbose);
+    // PL(modelobj, verbose);
     // get gr of LAML
     LAMLResult LAMLresult;
     LAMLresult = LAML(modelobj); // true: fn and gr
+    
+
     return List::create(Named("LAML.fn") = LAMLresult.fn,
                         Named("LAML.gradient") = LAMLresult.gradient,
                         Named("alpha_f.mod") = modelobj.alpha_f.cast<double>(),
@@ -2241,13 +2256,25 @@ List aceDLNMCI(const Eigen::VectorXd R_y,
   int n = y.size();
   // components for eta
   Vec E;
-  Vec eta_sample;
-  Eigen::VectorXd R_eta_sample;
-  Eigen::MatrixXd eta_sample_mat;
+  // Vec eta_sample;
+  Vec eta_E_sample;
+  Vec eta_other_sample;
+  // Eigen::VectorXd R_eta_sample;
+  Eigen::VectorXd R_eta_E_sample;
+  Eigen::VectorXd R_eta_other_sample;
+  // Eigen::MatrixXd eta_sample_mat;
+  Eigen::MatrixXd eta_E_sample_mat;
+  Eigen::MatrixXd eta_other_sample_mat;
   if(ifeta) {
-    eta_sample.resize(n);
-    R_eta_sample.resize(n);
-    eta_sample_mat.resize(Rci, n);
+    // eta_sample.resize(n);
+    eta_E_sample.resize(n);
+    eta_other_sample.resize(n);
+    // R_eta_sample.resize(n);
+    R_eta_E_sample.resize(n);
+    R_eta_other_sample.resize(n);
+    // eta_sample_mat.resize(Rci, n);
+    eta_E_sample_mat.resize(Rci, n);
+    eta_other_sample_mat.resize(Rci, n);
   }
 
   // Mode of phi
@@ -2364,10 +2391,20 @@ List aceDLNMCI(const Eigen::VectorXd R_y,
     if(ifeta) {
       E = B_inner * R_alpha_w_sample.cast<Scalar>();
       for (int ii = 0; ii < n; ii++) {
-        eta_sample(ii) = BsplinevecCon(E(ii), knots_f, 4, Zf).dot(R_alpha_f_sample.cast<Scalar>()) + Xfix.row(ii).dot(R_betaF_sample.cast<Scalar>()) + Xrand.row(ii).dot(R_betaR_sample.cast<Scalar>()) + Xoffset(ii);
+        eta_E_sample(ii) = BsplinevecCon(E(ii), knots_f, 4, Zf).dot(R_alpha_f_sample.cast<Scalar>());
+        eta_other_sample(ii) = Xfix.row(ii).dot(R_betaF_sample.cast<Scalar>()) + Xrand.row(ii).dot(R_betaR_sample.cast<Scalar>()) + Xoffset(ii);
+        // eta_sample(ii) = BsplinevecCon(E(ii), knots_f, 4, Zf).dot(R_alpha_f_sample.cast<Scalar>()) + Xfix.row(ii).dot(R_betaF_sample.cast<Scalar>()) + Xrand.row(ii).dot(R_betaR_sample.cast<Scalar>()) + Xoffset(ii);
       }
-      R_eta_sample = eta_sample.cast<double>();
-      eta_sample_mat.row(i) = R_eta_sample.transpose();
+      R_eta_E_sample = eta_E_sample.cast<double>();
+      R_eta_other_sample = eta_other_sample.cast<double>();
+      
+      R_eta_other_sample = R_eta_other_sample - R_eta_other_sample.mean()*Eigen::VectorXd::Ones(n);
+      R_eta_E_sample = R_eta_E_sample - R_eta_E_sample.mean()*Eigen::VectorXd::Ones(n);
+
+      eta_E_sample_mat.row(i) = R_eta_E_sample.transpose();
+      eta_other_sample_mat.row(i) = R_eta_other_sample.transpose();
+      // R_eta_sample = eta_sample.cast<double>();
+      // eta_sample_mat.row(i) = R_eta_sample.transpose();
     }
 
     // save
@@ -2381,7 +2418,8 @@ List aceDLNMCI(const Eigen::VectorXd R_y,
                         Named("alpha_f_sample") = alpha_f_sample_mat,
                         Named("betaR_sample") = betaR_sample_mat,
                         Named("betaF_sample") = betaF_sample_mat,
-                        Named("eta_sample_mat") = eta_sample_mat,
+                        Named("eta_E_sample_mat") = eta_E_sample_mat,
+                        Named("eta_other_sample_mat") = eta_other_sample_mat,
                         Named("Hessian_inner") = R_he);
   } else {
     return List::create(Named("phi_sample") = phi_sample_mat,
@@ -2389,7 +2427,8 @@ List aceDLNMCI(const Eigen::VectorXd R_y,
                       Named("alpha_f_sample") = alpha_f_sample_mat,
                       Named("betaR_sample") = betaR_sample_mat,
                       Named("betaF_sample") = betaF_sample_mat,
-                      Named("eta_sample_mat") = eta_sample_mat,
+                      Named("eta_E_sample_mat") = eta_E_sample_mat,
+                      Named("eta_other_sample_mat") = eta_other_sample_mat,
                       Named("Hessian_inner") = R_he);
   }
 
@@ -2457,11 +2496,13 @@ List ConditionalAIC(const Eigen::VectorXd R_y,
 
   double l = (double) modelobj.NegLogL_l;
   double edf = (2 * mat_AIC - mat_AIC * mat_AIC).trace();
+  double edf0 = mat_AIC.trace();
   double AIC = 2.0*l + 2.0*edf;
 
   return List::create(Named("AIC") = AIC,
                       Named("l") = -1.0*l,
-                      Named("edf") = edf);
+                      Named("edf") = edf,
+                      Named("edf0") = edf0);
 }
 
 
@@ -4100,13 +4141,25 @@ List aceDLNMCI_nosmooth(const Eigen::VectorXd R_y,
   int n = y.size();
   // components for eta
   Vec E;
-  Vec eta_sample;
-  Eigen::VectorXd R_eta_sample;
-  Eigen::MatrixXd eta_sample_mat;
+  // Vec eta_sample;
+  Vec eta_E_sample;
+  Vec eta_other_sample;
+  // Eigen::VectorXd R_eta_sample;
+  Eigen::VectorXd R_eta_E_sample;
+  Eigen::VectorXd R_eta_other_sample;
+  // Eigen::MatrixXd eta_sample_mat;
+  Eigen::MatrixXd eta_E_sample_mat;
+  Eigen::MatrixXd eta_other_sample_mat;
   if(ifeta) {
-    eta_sample.resize(n);
-    R_eta_sample.resize(n);
-    eta_sample_mat.resize(Rci, n);
+    // eta_sample.resize(n);
+    eta_E_sample.resize(n);
+    eta_other_sample.resize(n);
+    // R_eta_sample.resize(n);
+    R_eta_E_sample.resize(n);
+    R_eta_other_sample.resize(n);
+    // eta_sample_mat.resize(Rci, n);
+    eta_E_sample_mat.resize(Rci, n);
+    eta_other_sample_mat.resize(Rci, n);
   }
 
   // Mode of phi
@@ -4226,10 +4279,20 @@ List aceDLNMCI_nosmooth(const Eigen::VectorXd R_y,
     if(ifeta) {
       E = B_inner * R_alpha_w_sample.cast<Scalar>();
       for (int ii = 0; ii < n; ii++) {
-        eta_sample(ii) = BsplinevecCon(E(ii), knots_f, 4, Zf).dot(R_alpha_f_sample.cast<Scalar>()) + Xfix.row(ii).dot(R_betaF_sample.cast<Scalar>()) + Xoffset(ii);
+        eta_E_sample(ii) = BsplinevecCon(E(ii), knots_f, 4, Zf).dot(R_alpha_f_sample.cast<Scalar>());
+        eta_other_sample(ii) = Xfix.row(ii).dot(R_betaF_sample.cast<Scalar>()) + Xoffset(ii);
+        // eta_sample(ii) = BsplinevecCon(E(ii), knots_f, 4, Zf).dot(R_alpha_f_sample.cast<Scalar>()) + Xfix.row(ii).dot(R_betaF_sample.cast<Scalar>()) + Xoffset(ii);
       }
-      R_eta_sample = eta_sample.cast<double>();
-      eta_sample_mat.row(i) = R_eta_sample.transpose();
+      R_eta_E_sample = eta_E_sample.cast<double>();
+      R_eta_other_sample = eta_other_sample.cast<double>();
+
+      R_eta_other_sample = R_eta_other_sample - R_eta_other_sample.mean()*Eigen::VectorXd::Ones(n);
+      R_eta_E_sample = R_eta_E_sample - R_eta_E_sample.mean()*Eigen::VectorXd::Ones(n);
+
+      eta_E_sample_mat.row(i) = R_eta_E_sample.transpose();
+      eta_other_sample_mat.row(i) = R_eta_other_sample.transpose();
+      // R_eta_sample = eta_sample.cast<double>();
+      // eta_sample_mat.row(i) = R_eta_sample.transpose();
     }
 
     // save
@@ -4242,14 +4305,16 @@ List aceDLNMCI_nosmooth(const Eigen::VectorXd R_y,
     return List::create(Named("alpha_w_sample") = alpha_w_sample_mat,
                         Named("alpha_f_sample") = alpha_f_sample_mat,
                         Named("betaF_sample") = betaF_sample_mat,
-                        Named("eta_sample_mat") = eta_sample_mat,
+                        Named("eta_E_sample_mat") = eta_E_sample_mat,
+                        Named("eta_other_sample_mat") = eta_other_sample_mat,
                         Named("Hessian_inner") = R_he);
   } else {
     return List::create(Named("phi_sample") = phi_sample_mat,
                       Named("alpha_w_sample") = alpha_w_sample_mat,
                       Named("alpha_f_sample") = alpha_f_sample_mat,
                       Named("betaF_sample") = betaF_sample_mat,
-                      Named("eta_sample_mat") = eta_sample_mat,
+                      Named("eta_E_sample_mat") = eta_E_sample_mat,
+                      Named("eta_other_sample_mat") = eta_other_sample_mat,
                       Named("Hessian_inner") = R_he);
   }
 
@@ -4308,10 +4373,12 @@ List ConditionalAIC_nosmooth(const Eigen::VectorXd R_y,
 
   double l = (double) modelobj.NegLogL_l;
   double edf = (2 * mat_AIC - mat_AIC * mat_AIC).trace();
+  double edf0 = mat_AIC.trace();
   double AIC = 2.0*l + 2.0*edf;
 
   return List::create(Named("AIC") = AIC,
                       Named("l") = -1.0*l,
-                      Named("edf") = edf);
+                      Named("edf") = edf,
+                      Named("edf0") = edf0);
 }
 

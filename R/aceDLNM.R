@@ -294,6 +294,10 @@ aceDLNM <- function(formula,
   E.max <- do.call("max", lapply(DLprepare, "[[", "E.max"))
   if(missingArg(E.min)) E.min <- do.call("min", lapply(DLprepare, "[[", "E.min"))
   removed.t <- lapply(DLprepare, "[[", "removed.t")
+
+
+
+
   ## remove the starting time points
   sXdatlist <- mapply(function(sXdati, removed.ti) return(sXdati[-which(sXdati$t %in% removed.ti),]),
                       sXdatlist, removed.t, SIMPLIFY = FALSE)
@@ -301,7 +305,8 @@ aceDLNM <- function(formula,
 
   sXdat <- do.call("rbind", sXdatlist)
 
-
+  rm(DLprepare) # release memory
+  rm(sXdatlist) # release memory
 
   ## 1. time-varying fixed effects
   if(!is.null(fe.varying)) {
@@ -356,6 +361,10 @@ aceDLNM <- function(formula,
     if (length(dups) > 1) Xfix <- Xfix[ ,which(dups)]
 
     model.choice = "with.smooth"
+
+    rm(Xlist)
+    rm(X)
+
   } else{
     model.choice = "without.smooth"
   }
@@ -390,6 +399,10 @@ aceDLNM <- function(formula,
     Xoffset.original.min <- 0
     Xoffset <- as.vector(rep(0, nrow(sXdat)))
   }
+
+
+
+
   ### Model Fitting
 
   N <- nrow(sXdat)
@@ -617,6 +630,7 @@ aceDLNM <- function(formula,
           if((par.start[i] > (upper.bound[i] - 1)) | (par.start[i] < lower.bound[i])) par.start[i] <- 7
         }
         if(verbose) cat("Use results from mgcv::bam with same-day exposure as the initial guess for BFGS. \n ")
+        rm(mod.mgcv)
       },
       # warning = function(w) {
       #   if(verbose) {
@@ -840,14 +854,23 @@ aceDLNM <- function(formula,
   eta1 <- as.vector(t(Bf) %*% out$point$alpha_f)
   eta2 <- as.vector(Xfix %*% out$point$betaF)
   if(exists("Xrand")) eta2 <- eta2 + as.vector(Xrand %*% out$point$betaR)
-  eta.est <- eta1+eta2 + Xoffset
-  out$eta = data.frame(est = eta.est)
+  out$eta.est <- eta1 + eta2 + Xoffset
+
+  eta_E.est <- eta1 - mean(eta1)
+  eta_other.est <- eta2 + Xoffset - mean(eta2 + Xoffset)
+  
+  out$eta_E = data.frame(est = eta_E.est)
+  out$eta_other = data.frame(est = eta_other.est)
 
   if(eta) {
-    eta.CI <- apply(sampled$eta_sample_mat, 2, function(row.) quantile(row., c((1-CI)/2, 1-(1-CI)/2)))
-    out$eta = data.frame(est = eta.est,
-                         ll = eta.CI[1,],
-                         ul = eta.CI[2,])
+    eta_E.CI <- apply(sampled$eta_E_sample_mat, 2, function(row.) quantile(row., c((1-CI)/2, 1-(1-CI)/2)))
+    eta_other.CI <- apply(sampled$eta_other_sample_mat, 2, function(row.) quantile(row., c((1-CI)/2, 1-(1-CI)/2)))
+    out$eta_E = data.frame(est = eta_E.est,
+                           ll = eta_E.CI[1,],
+                           ul = eta_E.CI[2,])
+    out$eta_other = data.frame(est = eta_other.est,
+                               ll = eta_other.CI[1,],
+                               ul = eta_other.CI[2,])
   }
   if(verbose){
     runningtime <- as.numeric(difftime(Sys.time(), start, units = "secs"))

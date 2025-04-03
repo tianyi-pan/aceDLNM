@@ -213,9 +213,16 @@ GenerateData <- function(fEtype, wltype, Nt = 1000, kx.per500 = 100,
 
   ## linear predictor
   eta.sim <- sapply(E.sim, fE)
+  eta_E.sim <- eta.sim
+  eta_E.sim <- eta_E.sim - mean(eta_E.sim)
+  eta_other.sim <- rep(0, length(eta_E.sim))
   if (!missingArg(other)) {
+    eta_other.sim <- apply(other, 1, sum)
+    eta_other.sim <- eta_other.sim - mean(eta_other.sim)
     eta.sim <- eta.sim + apply(other, 1, sum)
   }
+
+
 
   ## generate data
   y.sim <- sapply(eta.sim, function(eta.) rnbinom(n = 1, size = theta, mu = exp(eta.)))
@@ -226,6 +233,8 @@ GenerateData <- function(fEtype, wltype, Nt = 1000, kx.per500 = 100,
               t.sim = t.sim,
               E.sim = E.sim,
               eta.sim = eta.sim,
+              eta_E.sim = eta_E.sim,
+              eta_other.sim = eta_other.sim,
               y = c(rep(0, maxL), y.sim),
               x = PM25,
               t = t,
