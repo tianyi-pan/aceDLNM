@@ -856,8 +856,8 @@ aceDLNM <- function(formula,
   if(exists("Xrand")) eta2 <- eta2 + as.vector(Xrand %*% out$point$betaR)
   out$eta.est <- eta1 + eta2 + Xoffset
 
-  eta_E.est <- eta1 - mean(eta1)
-  eta_other.est <- eta2 + Xoffset - mean(eta2 + Xoffset)
+  eta_E.est <- eta1 + mean(eta2)
+  eta_other.est <- eta2 - mean(eta2)
   
   out$eta_E = data.frame(est = eta_E.est)
   out$eta_other = data.frame(est = eta_other.est)

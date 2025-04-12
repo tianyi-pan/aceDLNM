@@ -20,7 +20,7 @@ residuals.aceDLNM_fit <- function(object, seed = 123, plot = FALSE,
                                      nsample = 1e4, curve = FALSE, ...){
   set.seed(seed)
 
-  eta <- object$eta$est
+  eta <- object$eta.est
   y <- object$modeldata$y
   x <- object$modeldata$x
   t <- object$modeldata$t
