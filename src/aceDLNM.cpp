@@ -2401,6 +2401,8 @@ List aceDLNMCI(const Eigen::VectorXd R_y,
       // R_eta_other_sample = R_eta_other_sample - R_eta_other_sample.mean()*Eigen::VectorXd::Ones(n);
       // R_eta_E_sample = R_eta_E_sample - R_eta_E_sample.mean()*Eigen::VectorXd::Ones(n);
       
+      // std::cout << "R_eta_other_sample.mean()-R_betaF_sample(0)" << R_eta_other_sample.mean()-R_betaF_sample(0) << std::endl;
+
       R_eta_E_sample = R_eta_E_sample + R_eta_other_sample.mean()*Eigen::VectorXd::Ones(n);
       R_eta_other_sample = R_eta_other_sample - R_eta_other_sample.mean()*Eigen::VectorXd::Ones(n);
 
@@ -4283,14 +4285,17 @@ List aceDLNMCI_nosmooth(const Eigen::VectorXd R_y,
       E = B_inner * R_alpha_w_sample.cast<Scalar>();
       for (int ii = 0; ii < n; ii++) {
         eta_E_sample(ii) = BsplinevecCon(E(ii), knots_f, 4, Zf).dot(R_alpha_f_sample.cast<Scalar>());
-        eta_other_sample(ii) = Xfix.row(ii).dot(R_betaF_sample.cast<Scalar>()) + Xoffset(ii);
+        eta_other_sample(ii) = Xfix.row(ii).dot(R_betaF_sample.cast<Scalar>()); // + Xoffset(ii);
         // eta_sample(ii) = BsplinevecCon(E(ii), knots_f, 4, Zf).dot(R_alpha_f_sample.cast<Scalar>()) + Xfix.row(ii).dot(R_betaF_sample.cast<Scalar>()) + Xoffset(ii);
       }
       R_eta_E_sample = eta_E_sample.cast<double>();
       R_eta_other_sample = eta_other_sample.cast<double>();
 
+      // R_eta_other_sample = R_eta_other_sample - R_eta_other_sample.mean()*Eigen::VectorXd::Ones(n);
+      // R_eta_E_sample = R_eta_E_sample - R_eta_E_sample.mean()*Eigen::VectorXd::Ones(n);
+
+      R_eta_E_sample = R_eta_E_sample + R_eta_other_sample.mean()*Eigen::VectorXd::Ones(n);
       R_eta_other_sample = R_eta_other_sample - R_eta_other_sample.mean()*Eigen::VectorXd::Ones(n);
-      R_eta_E_sample = R_eta_E_sample - R_eta_E_sample.mean()*Eigen::VectorXd::Ones(n);
 
       eta_E_sample_mat.row(i) = R_eta_E_sample.transpose();
       eta_other_sample_mat.row(i) = R_eta_other_sample.transpose();
