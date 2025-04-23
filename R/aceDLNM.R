@@ -71,6 +71,7 @@ aceDLNM <- function(formula,
                     interpolate = TRUE,
                     kx.per500 = 300,
                     E.min,
+                    E.max,
                     pc = NULL,
                     par.start, par.fix, upper.bound,
                     CI = 0.95,
@@ -291,7 +292,7 @@ aceDLNM <- function(formula,
   B_inner <- do.call("rbind", lapply(DLprepare, "[[", "B_inner"))
 
   Dw <- DLprepare[[1]]$Dw
-  E.max <- do.call("max", lapply(DLprepare, "[[", "E.max"))
+  if(missingArg(E.max)) E.max <- do.call("max", lapply(DLprepare, "[[", "E.max"))
   if(missingArg(E.min)) E.min <- do.call("min", lapply(DLprepare, "[[", "E.min"))
   removed.t <- lapply(DLprepare, "[[", "removed.t")
 
@@ -858,7 +859,7 @@ aceDLNM <- function(formula,
 
   eta_E.est <- eta1 + mean(eta2)
   eta_other.est <- eta2 - mean(eta2)
-  
+
   out$eta_E = data.frame(est = eta_E.est)
   out$eta_other = data.frame(est = eta_other.est)
 

@@ -17,7 +17,7 @@
 #'   \code{E.eval} and \code{others.eval} or the default values, (2) AIC, and
 #'   (3) plots.
 #' @export
-summary.aceDLNM_fit <- function(object, E.eval, others.eval = NULL,
+summary.aceDLNM_fit <- function(object, E.eval, l.eval, others.eval = NULL,
                                    plot = FALSE, true.function,
                                    contrast = FALSE,
                                    contrast.lower = 0, contrast.upper = 1,
@@ -33,7 +33,7 @@ summary.aceDLNM_fit <- function(object, E.eval, others.eval = NULL,
   Ufpen <- object$data$Ufpen
   Uwpen <- object$data$Uwpen
 
-  l.eval <- seq(0, object$data$maxL+1, length.out = max(object$data$maxL+1, 500))
+  if(missingArg(l.eval)) l.eval <- seq(0, object$data$maxL+1, length.out = max(object$data$maxL+1, 500))
   wl.fit <- function(lnew) mgcv::PredictMat(object$smooth$wl, data = data.frame(l = lnew)) %*% Uwpen %*% alpha_w[2:kw] + alpha_w[1]
 
   # wl.fit <- function(lnew) Bsplinevec2Con(lnew, object$data$knots_w, 4, object$data$Zw %*% Uwpen) %*% alpha_w[2:kw] + alpha_w[1]
