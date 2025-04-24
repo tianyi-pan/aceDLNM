@@ -825,6 +825,7 @@ aceDLNM <- function(formula,
     out$point$log_smoothing = log_smoothing.opt
   }
 
+
   ## CI
   if(verbose) {
     cat("Start sampling for CI ... \n")
@@ -851,6 +852,10 @@ aceDLNM <- function(formula,
   }
 
   E <- B_inner %*% out$point$alpha_w
+  if( min(E) < E.min ) {
+    warning("We have to set a wide but safe lower bound for Et.
+            Please rerun the model with argument E.min = -1.0*out$data$E.max, replacing `out` by the name of output object.")
+  }
   Bf <- sapply(E, function(Ei) Bsplinevec2Con(Ei, SSf$knots, 4, Zfnew))
   eta1 <- as.vector(t(Bf) %*% out$point$alpha_f)
   eta2 <- as.vector(Xfix %*% out$point$betaF)
