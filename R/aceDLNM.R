@@ -633,12 +633,12 @@ aceDLNM <- function(formula,
         if(verbose) cat("Use results from mgcv::bam with same-day exposure as the initial guess for BFGS. \n ")
         rm(mod.mgcv)
       },
-      # warning = function(w) {
-      #   if(verbose) {
-      #     cat("some warnings from bam() for setting the initial guess. Its influence on the model fitting is ignorable, but you can set par.start by hand. \n")
-      #     warning(w)
-      #   }
-      # },
+      warning = function(w) {
+        if(verbose) {
+          cat("some warnings from bam() for setting the initial guess. Its influence on the model fitting is ignorable, but you can set par.start by hand. \n")
+          warning(w)
+        }
+      },
       error = function(e) {
         cat("use default starting values for BFGS ... \n")
       }
