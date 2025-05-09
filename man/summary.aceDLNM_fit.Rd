@@ -7,6 +7,7 @@
 \method{summary}{aceDLNM_fit}(
   object,
   E.eval,
+  l.eval,
   others.eval = NULL,
   plot = FALSE,
   true.function,

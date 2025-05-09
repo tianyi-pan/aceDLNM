@@ -12,6 +12,7 @@
 #'   components. For example ~ z
 #' @param fe.cont the formula for time-invariant covariates in linear
 #'   components. For example ~ z
+#' @param offset Offset in the negative binomial regression.
 #' @param dat the data frame containing the variables.
 #' @param maxL the maximum lag, default 14.
 #' @param kw the dimension for B-spline for weight function, default 20.
@@ -21,6 +22,8 @@
 #'   B-spline), default \code{TRUE}.
 #' @param kx.per500 the number of knots to fit exposures using B-spline. The
 #'   argument works only if \code{interpolate = FALSE}.
+#' @param E.max the upper bound of ACE. Default: determined by the
+#'   Cauchy-Schwarz inequality.
 #' @param E.min the lower bound of ACE. The lower bound is set as the minimum of
 #'   the exposure if E.min is missing, since this the range we are typically
 #'   interested in.
@@ -50,6 +53,7 @@
 #' @param GD.grtol the tolerance of maximum gradient, default 1. The maximum
 #'   numbers of steps for gradient descent is 2. But the BFGS converges in most
 #'   cases.
+#' @param check.BFGS whether or not to diagnose the BFGS algorithm
 #' @param verbose whether or not to print the progress and diagnostic
 #'   information, such as the gradients and function values in inner and middle
 #'   optimizations.

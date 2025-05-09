@@ -4,12 +4,14 @@
 \alias{sX}
 \title{Title formula for Effect of exposure process}
 \usage{
-sX(t, x)
+sX(t, x, by)
 }
 \arguments{
 \item{t}{time variable}
 
 \item{x}{exposure variable}
+
+\item{by}{}
 }
 \value{
 a formula for model fitting in \code{aceDLNM}.

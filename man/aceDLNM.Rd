@@ -11,6 +11,7 @@ aceDLNM(
   unpen.smooth = NULL,
   fe.varying = NULL,
   fe.cont = NULL,
+  offset = NULL,
   dat = NULL,
   maxL = 14,
   kw = 20,
@@ -18,6 +19,7 @@ aceDLNM(
   interpolate = TRUE,
   kx.per500 = 300,
   E.min,
+  E.max,
   pc = NULL,
   par.start,
   par.fix,
@@ -51,6 +53,8 @@ components. For example ~ z}
 \item{fe.cont}{the formula for time-invariant covariates in linear
 components. For example ~ z}
 
+\item{offset}{Offset in the negative binomial regression.}
+
 \item{dat}{the data frame containing the variables.}
 
 \item{maxL}{the maximum lag, default 14.}
@@ -69,6 +73,9 @@ argument works only if \code{interpolate = FALSE}.}
 \item{E.min}{the lower bound of ACE. The lower bound is set as the minimum of
 the exposure if E.min is missing, since this the range we are typically
 interested in.}
+
+\item{E.max}{the upper bound of ACE. Default: determined by the
+Cauchy-Schwarz inequality.}
 
 \item{pc}{the point constraint for ACE response-exposure-function, i.e. f(x0)
 = 0. Use sum-to-zero constraint if \code{pc = NULL}. Default \code{pc =
@@ -107,6 +114,8 @@ GD.grtol), default \code{TRUE}.}
 \item{GD.grtol}{the tolerance of maximum gradient, default 1. The maximum
 numbers of steps for gradient descent is 2. But the BFGS converges in most
 cases.}
+
+\item{check.BFGS}{whether or not to diagnose the BFGS algorithm}
 
 \item{verbose}{whether or not to print the progress and diagnostic
 information, such as the gradients and function values in inner and middle
