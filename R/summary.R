@@ -336,12 +336,12 @@ summary.aceDLNM_fit <- function(object, E.eval, l.eval, others.eval = NULL,
     oask <- devAskNewPage(TRUE)
     on.exit(devAskNewPage(oask))
 
-    with(out$est$fE, plot(E, mode, type = "l", ylim = c(min(ll), max(ul)), ylab = "est", xlab = "weighted exposure"))
+    with(out$est$fE, plot(E, mode, type = "l", ylim = c(min(ll), max(ul)), ylab = "f(ACE)", xlab = "ACE"))
     with(out$est$fE, lines(E, ll, lty = "dashed"))
     with(out$est$fE, lines(E, ul, lty = "dashed"))
     if(!missingArg(true.function)) with(out$est$fE, lines(E, true, col = "blue"))
 
-    with(out$est$wl, plot(l, mode, type = "l", ylim = c(min(ll), max(ul)), ylab = "est", xlab = "weight"))
+    with(out$est$wl, plot(l, mode, type = "l", ylim = c(min(ll), max(ul)), ylab = "w(lag)", xlab = "lag"))
     with(out$est$wl, lines(l, ll, lty = "dashed"))
     with(out$est$wl, lines(l, ul, lty = "dashed"))
     if(!missingArg(true.function)) with(out$est$wl, lines(l, true, col = "blue"))
@@ -349,7 +349,7 @@ summary.aceDLNM_fit <- function(object, E.eval, l.eval, others.eval = NULL,
     if(!is.null(object$smooth$others)) {
       for(var. in unique(smooth.df$var)){
         smooth.df. <- filter(smooth.df, var == var.)
-        with(smooth.df., plot(x, mode, type = "l", ylim = c(min(ll), max(ul)), ylab = "est", xlab = var.))
+        with(smooth.df., plot(x, mode, type = "l", ylim = c(min(ll), max(ul)), ylab = paste0("h(", var.,")"), xlab = var.))
         with(smooth.df., lines(x, ll, lty = "dashed"))
         with(smooth.df., lines(x, ul, lty = "dashed"))
         if(!missingArg(true.function)){
