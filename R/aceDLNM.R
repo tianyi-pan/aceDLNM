@@ -125,12 +125,13 @@ aceDLNM <- function(formula,
     if(is.null(fe.cont) & is.null(byvar)) stop("The exposure process data are duplicated at some time point. Please provide fe.cout.")
 
     if(!is.null(fe.cont)){
-      group_name.fe.cont <- fe.cont[[2]]
-      if(length(group_name.fe.cont) >= 2) {
-        group_name.fe.cont <- as.character(group_name.fe.cont[2:length(group_name.fe.cont)])
-      } else {
-        group_name.fe.cont <- as.character(group_name.fe.cont)
-      }
+      # group_name.fe.cont <- fe.cont[[2]]
+      # if(length(group_name.fe.cont) >= 2) {
+      #   group_name.fe.cont <- as.character(group_name.fe.cont[2:length(group_name.fe.cont)])
+      # } else {
+      #   group_name.fe.cont <- as.character(group_name.fe.cont)
+      # }
+      group_name.fe.cont <- all.vars(fe.cont)
     } else {
       group_name.fe.cont <- NULL
     }
