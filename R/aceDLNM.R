@@ -201,6 +201,9 @@ aceDLNM <- function(formula,
     x <- sXdati$x
     y <- sXdati$y
     t <- sXdati$t
+    removed.t <- t[1:maxL] # removed id for the original t
+    t <- t - min(t) + 1 # set t starting at 1
+
     Nti <- length(y) - maxL
     if((kx.per500 > 300) || (interpolate == TRUE)) {
       # if(verbose) cat("Interpolate the exposure process. \n")
@@ -253,7 +256,6 @@ aceDLNM <- function(formula,
 
 
     ### 0.2 Integration
-    removed.t <- t[1:maxL]
     t <- t[-(1:maxL)] # delete the first maxL days
     y <- y[-(1:maxL)] # delete the first maxL days
     x <- x[-(1:maxL)] # delete the first maxL days
@@ -538,7 +540,7 @@ aceDLNM <- function(formula,
       if(any(is.nan(betaF.init))) betaF.init <- betaF.init.default
       if(model.choice == "with.smooth"){
         betaR.init <- LAMLenv$mod$betaR.mod
-        if(any(is.nan(betaF.init))) betaR.init <- betaR.init.default
+        if(any(is.nan(betaR.init))) betaR.init <- betaR.init.default
         LAML.results <- aceDLNMopt(y, B_inner, SSf$knots, SwI, SfI, Dw,
                                       Xrand, Xfix, Zfnew, Xoffset, r,
                                       alpha_f.init,

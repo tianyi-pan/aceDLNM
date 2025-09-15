@@ -11,3 +11,4 @@ devtools::install_github("tianyi-pan/aceDLNM")
 
 ## Documentation
 + A brief [vignette](https://tianyi-pan.github.io/aceDLNM)
++ [Paper](https://academic.oup.com/biometrics/article/81/3/ujaf116/8253979)
